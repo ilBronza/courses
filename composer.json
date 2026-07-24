@@ -1,0 +1,25 @@
+{
+    "name": "ilbronza/courses",
+    "description": "Gestione corsi, sessioni, date, presenze e responsabilita per il gestionale IlBronza.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0",
+        "ilbronza/operators": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "IlBronza\\Courses\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "IlBronza\\Courses\\Providers\\CoursesProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
