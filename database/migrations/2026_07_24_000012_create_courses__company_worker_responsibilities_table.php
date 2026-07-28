@@ -11,9 +11,9 @@ return new class extends Migration
 		Schema::create('courses__company_worker_responsibilities', function (Blueprint $table)
 		{
 			$table->uuid('id')->primary();
-			$table->foreignUuid('id_company_worker')->constrained('courses__company_workers');
-			$table->string('id_responsibility', 16);
-			$table->foreign('id_responsibility')->references('id')->on('courses__responsibilities');
+			$table->foreignUuid('company_worker_id')->constrained('courses__company_workers');
+			$table->string('responsibility_id', 16);
+			$table->foreign('responsibility_id')->references('id')->on('courses__responsibilities');
 			$table->timestamps();
 		});
 	}

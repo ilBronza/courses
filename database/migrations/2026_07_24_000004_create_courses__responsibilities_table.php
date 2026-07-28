@@ -11,7 +11,9 @@ return new class extends Migration
 		Schema::create('courses__responsibilities', function (Blueprint $table)
 		{
 			$table->string('id', 16)->primary();
+			$table->string('description')->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

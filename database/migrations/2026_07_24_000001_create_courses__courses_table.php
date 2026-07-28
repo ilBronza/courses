@@ -11,8 +11,11 @@ return new class extends Migration
 		Schema::create('courses__courses', function (Blueprint $table)
 		{
 			$table->uuid('id')->primary();
-			$table->string('nome');
+			$table->string('name');
+			$table->string('alias')->nullable();
+			$table->integer('validity_months')->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

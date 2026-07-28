@@ -11,11 +11,13 @@ return new class extends Migration
 		Schema::create('courses__course_sessions', function (Blueprint $table)
 		{
 			$table->uuid('id')->primary();
-			$table->foreignUuid('id_corso')->constrained('courses__courses');
-			$table->string('nome');
-			$table->date('data_inizio_desiderata')->nullable();
-			$table->date('data_fine_desiderata')->nullable();
+			$table->foreignUuid('course_id')->constrained('courses__courses');
+			$table->string('name');
+			$table->date('desired_start_date')->nullable();
+			$table->date('desired_end_date')->nullable();
+			$table->integer('min_workers')->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

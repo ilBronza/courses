@@ -8,17 +8,17 @@ return new class extends Migration
 {
 	public function up()
 	{
-		Schema::create('courses__operator_coursesessions', function (Blueprint $table)
+		Schema::create('courses__worker_coursesessions', function (Blueprint $table)
 		{
 			$table->uuid('id')->primary();
-			$table->foreignUuid('id_sessione_corso')->constrained('courses__course_sessions');
-			$table->foreignUuid('id_operator')->constrained('operators__operators');
+			$table->foreignUuid('course_session_id')->constrained('courses__course_sessions');
+			$table->foreignUuid('worker_id')->constrained('courses__workers');
 			$table->timestamps();
 		});
 	}
 
 	public function down()
 	{
-		Schema::dropIfExists('courses__operator_coursesessions');
+		Schema::dropIfExists('courses__worker_coursesessions');
 	}
 };

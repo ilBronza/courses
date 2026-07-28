@@ -11,10 +11,11 @@ return new class extends Migration
 		Schema::create('courses__date_sessions', function (Blueprint $table)
 		{
 			$table->uuid('id')->primary();
-			$table->foreignUuid('id_tipo_data')->constrained('courses__dates');
-			$table->decimal('ore', 5, 2);
-			$table->dateTime('data_inizio')->nullable();
+			$table->foreignUuid('date_id')->constrained('courses__dates');
+			$table->decimal('hours', 5, 2);
+			$table->dateTime('starts_at')->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

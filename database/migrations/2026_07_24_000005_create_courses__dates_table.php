@@ -11,12 +11,15 @@ return new class extends Migration
 		Schema::create('courses__dates', function (Blueprint $table)
 		{
 			$table->uuid('id')->primary();
-			$table->foreignUuid('id_corso')->constrained('courses__courses');
-			$table->string('nome');
-			$table->decimal('ore', 5, 2);
-			$table->decimal('ore_obbligatorie', 5, 2);
-			$table->boolean('remotizzabile')->default(false);
+			$table->foreignUuid('course_id')->constrained('courses__courses');
+			$table->string('name');
+			$table->text('description')->nullable();
+			$table->integer('sorting_index')->nullable();
+			$table->decimal('hours', 5, 2);
+			$table->decimal('minimum_hours', 5, 2);
+			$table->boolean('remoteable')->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

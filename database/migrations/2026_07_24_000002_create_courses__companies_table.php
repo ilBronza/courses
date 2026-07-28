@@ -11,8 +11,10 @@ return new class extends Migration
 		Schema::create('courses__companies', function (Blueprint $table)
 		{
 			$table->uuid('id')->primary();
-			$table->string('nome');
+			$table->uuid('company_id')->index();
+			$table->foreign('company_id')->references('id')->on(Client::gpc()::make()->getTable())->onDelete('cascade');
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

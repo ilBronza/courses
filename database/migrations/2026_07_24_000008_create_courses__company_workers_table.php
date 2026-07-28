@@ -11,9 +11,10 @@ return new class extends Migration
 		Schema::create('courses__company_workers', function (Blueprint $table)
 		{
 			$table->uuid('id')->primary();
-			$table->foreignUuid('id_company')->constrained('courses__companies');
-			$table->foreignUuid('id_worker')->constrained('courses__workers');
+			$table->foreignUuid('company_id')->constrained('courses__companies');
+			$table->foreignUuid('worker_id')->constrained('courses__workers');
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 
