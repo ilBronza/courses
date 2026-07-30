@@ -1,5 +1,6 @@
 <?php
 
+use IlBronza\Operators\Models\Operator;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

@@ -3,21 +3,40 @@
     "description": "Gestione corsi, sessioni, date, presenze e responsabilita per il gestionale IlBronza.",
     "type": "library",
     "license": "proprietary",
+    "authors": [
+        {
+            "name": "Davide Bronzini",
+            "email": "davide_bronzini@hotmail.com",
+            "homepage": "https://sistema.srl"
+        }
+    ],
+    "homepage": "https://github.com/ilbronza/courses",
+    "keywords": ["Laravel", "Courses"],
     "require": {
         "php": "^8.1",
-        "illuminate/support": "^10.0|^11.0",
+        "illuminate/support": "^10.0|^11.0|^12.0",
         "ilbronza/operators": "*"
+    },
+    "require-dev": {
     },
     "autoload": {
         "psr-4": {
             "IlBronza\\Courses\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "IlBronza\\Courses\\Tests\\": "tests"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
-                "IlBronza\\Courses\\Providers\\CoursesProvider"
-            ]
+                "IlBronza\\Courses\\CoursesServiceProvider"
+            ],
+            "aliases": {
+                "Courses": "IlBronza\\Courses\\Facades\\Courses"
+            }
         }
     },
     "minimum-stability": "dev",
