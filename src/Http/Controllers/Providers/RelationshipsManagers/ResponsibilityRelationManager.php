@@ -11,8 +11,14 @@ class ResponsibilityRelationManager extends RelationshipsManager
 		return [
 			'show' => [
 				'relations' => [
-					'operatorResponsibilities' => config('courses.models.operatorResponsibility.controllers.index'),
-					'clientOperatorResponsibilities' => config('courses.models.clientOperatorResponsibility.controllers.index'),
+					'operatorResponsibilities' => [
+						'controller' => config('courses.models.operatorResponsibility.controllers.index'),
+						'fieldsGroupsParametersFile' => config('courses.models.operatorResponsibility.fieldsGroupsFiles.relatedByResponsibility'),
+					],
+					'clientOperatorResponsibilities' => [
+						'controller' => config('courses.models.clientOperatorResponsibility.controllers.index'),
+						'fieldsGroupsParametersFile' => config('courses.models.clientOperatorResponsibility.fieldsGroupsFiles.relatedByResponsibility'),
+					],
 				]
 			]
 		];

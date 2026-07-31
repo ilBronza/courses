@@ -14,8 +14,10 @@ return [
 	'worker' => 'Lavoratore',
 	'companies' => 'Aziende',
 	'company' => 'Azienda',
-	'responsibilities' => 'Mansioni',
-	'responsibility' => 'Mansione',
+	'responsibilities' => 'Responsabilità',
+	'responsibility' => 'Responsabilità',
+	'operatorResponsibilities' => 'Responsabilità operatori',
+	'operatorResponsibility' => 'Responsabilità operatore',
 	'attendances' => 'Presenze',
 	'attendance' => 'Presenza',
 ];

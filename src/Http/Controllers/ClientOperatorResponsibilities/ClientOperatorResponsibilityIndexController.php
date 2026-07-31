@@ -19,7 +19,7 @@ class ClientOperatorResponsibilityIndexController extends ClientOperatorResponsi
 
 	public function getRelatedFieldsArray()
 	{
-		return $this->getIndexFieldsArray();
+		return config('courses.models.clientOperatorResponsibility.fieldsGroupsFiles.relatedByClientOperator')::getTracedFieldsGroup();
 	}
 
 	public function getIndexElements()

@@ -4,7 +4,7 @@ namespace IlBronza\Courses\Http\Controllers\Providers\FieldsGroups;
 
 use IlBronza\Datatables\Providers\FieldsGroupParametersFile;
 
-class ResponsibilityFieldsGroupParametersFile extends FieldsGroupParametersFile
+class OperatorResponsibilityByResponsibilityFieldsGroupParametersFile extends FieldsGroupParametersFile
 {
 	static function getFieldsGroup() : array
 	{
@@ -13,18 +13,18 @@ class ResponsibilityFieldsGroupParametersFile extends FieldsGroupParametersFile
 			'fields' =>
 			[
 				'mySelfPrimary' => 'primary',
-				'mySelfEdit' => 'links.edit',
-				'mySelfSee' => 'links.see',
 				'mySelfCalculate' => [
 					'type' => 'links.link',
 					'function' => 'getCalculateUrl',
 				],
-				'id' => 'flat',
-				'common_responsibility' => 'flat',
-				'description' => 'flat',
-				'operator_responsibilities_count' => 'flat',
-				'client_operator_responsibilities_count' => 'flat',
-				'mySelfDelete' => 'links.delete'
+
+				'operator.name' => 'flat',
+				'completed_at' => 'dates.date',
+				'valid_to' => 'dates.date',
+				'valid' => 'boolean',
+				'errors' => 'flat',
+				'parsed_at' => 'dates.datetime',
+				'mySelfDelete' => 'links.delete',
 			]
 		];
 	}

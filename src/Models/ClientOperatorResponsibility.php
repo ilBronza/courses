@@ -3,21 +3,19 @@
 namespace IlBronza\Courses\Models;
 
 use IlBronza\Courses\Models\CoursesPackageBasePivotModel;
-use IlBronza\Courses\Models\Responsibility;
-use IlBronza\Operators\Models\ClientOperator;
+use IlBronza\Courses\Traits\Models\ClientOperatorResponsibilityGettersSettersTrait;
+use IlBronza\Courses\Traits\Models\ClientOperatorResponsibilityRelationsTrait;
 
 class ClientOperatorResponsibility extends CoursesPackageBasePivotModel
 {
+	use ClientOperatorResponsibilityGettersSettersTrait;
+	use ClientOperatorResponsibilityRelationsTrait;
+
 	static $modelConfigPrefix = 'clientOperatorResponsibility';
 	static $deletingRelationships = [];
 
-	public function clientOperator()
+	public function getCalculateUrl() : string
 	{
-		return $this->belongsTo(ClientOperator::gpc());
-	}
-
-	public function responsibility()
-	{
-		return $this->belongsTo(Responsibility::gpc());
+		return $this->getKeyedRoute('calculate');
 	}
 }

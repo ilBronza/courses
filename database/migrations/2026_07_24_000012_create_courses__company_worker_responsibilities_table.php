@@ -14,6 +14,7 @@ return new class extends Migration
 			$table->foreignUuid('client_operator_id')->constrained('operators__client_operators', 'id', 'crs_cli_op_resp_cli_op_fk');
 			$table->string('responsibility_id', 16);
 			$table->foreign('responsibility_id', 'crs_cli_op_resp_resp_fk')->references('id')->on('courses__responsibilities');
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

@@ -13,6 +13,13 @@ class OperatorResponsibilityFieldsGroupParametersFile extends FieldsGroupParamet
 			'fields' =>
 			[
 				'mySelfPrimary' => 'primary',
+				'mySelfEdit' => 'links.edit',
+				'mySelfSee' => 'links.see',
+				'mySelfCalculate' => [
+					'type' => 'links.ajaxUrl',
+					'faIcon' => 'calendar-check',
+					'function' => 'getCalculateUrl',
+				],
 
 				'operator.name' => 'flat',
 				'responsibility.description' => 'flat',
@@ -20,7 +27,9 @@ class OperatorResponsibilityFieldsGroupParametersFile extends FieldsGroupParamet
 				'completed_at' => 'dates.date',
 				'valid_to' => 'dates.date',
 				'valid' => 'boolean',
-				'parsed_at' => 'dates.datetime'
+				'errors' => 'flat',
+				'parsed_at' => 'dates.datetime',
+				'mySelfDelete' => 'links.delete',
 			]
 		];
 	}

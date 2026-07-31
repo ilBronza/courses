@@ -3,11 +3,16 @@
 namespace IlBronza\Courses\Models;
 
 use IlBronza\Courses\Models\CoursesPackageBasePivotModel;
-use IlBronza\Courses\Models\Responsibility;
-use IlBronza\Operators\Models\Operator;
+use IlBronza\Courses\Traits\Models\OperatorResponsibilityGettersSettersTrait;
+use IlBronza\Courses\Traits\Models\OperatorResponsibilityRelationsTrait;
+use IlBronza\Courses\Traits\Models\OperatorResponsibilityScopesTrait;
 
 class OperatorResponsibility extends CoursesPackageBasePivotModel
 {
+	use OperatorResponsibilityGettersSettersTrait;
+	use OperatorResponsibilityRelationsTrait;
+	use OperatorResponsibilityScopesTrait;
+
 	static $modelConfigPrefix = 'operatorResponsibility';
 	static $deletingRelationships = [];
 
@@ -18,13 +23,8 @@ class OperatorResponsibility extends CoursesPackageBasePivotModel
 		'valid' => 'boolean',
 	];
 
-	public function operator()
+	public function getCalculateUrl() : string
 	{
-		return $this->belongsTo(Operator::gpc());
-	}
-
-	public function responsibility()
-	{
-		return $this->belongsTo(Responsibility::gpc());
+		return $this->getKeyedRoute('calculateByOperatorResponsibility');
 	}
 }

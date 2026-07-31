@@ -12,6 +12,7 @@ class ResponsibilityEditUpdateFieldsetsParameters extends FieldsetParametersFile
 			'baseParameters' => [
 				'translationPrefix' => 'courses::fields',
 				'fields' => [
+					'common_responsibility' => ['text' => 'string|nullable|max:16'],
 					'description' => ['text' => 'string|nullable'],
 				],
 				'width' => ['large']

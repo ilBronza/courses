@@ -2,17 +2,16 @@
 
 namespace IlBronza\Courses\Models;
 
+use IlBronza\Courses\Traits\Models\ResponsibilityRelationsTrait;
+
 class Responsibility extends CoursesPackageBaseModel
 {
+	use ResponsibilityRelationsTrait;
+
 	static $modelConfigPrefix = 'responsibility';
 
-	public function clientOperatorResponsibilities()
+	public function getCalculateUrl() : string
 	{
-		return $this->hasMany(ClientOperatorResponsibility::gpc());
-	}
-
-	public function operatorResponsibilities()
-	{
-		return $this->hasMany(OperatorResponsibility::gpc());
+		return $this->getKeyedRoute('calculateByResponsibility');
 	}
 }

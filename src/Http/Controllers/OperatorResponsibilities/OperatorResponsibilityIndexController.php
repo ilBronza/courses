@@ -19,7 +19,7 @@ class OperatorResponsibilityIndexController extends OperatorResponsibilityCRUD
 
 	public function getRelatedFieldsArray()
 	{
-		return $this->getIndexFieldsArray();
+		return config('courses.models.operatorResponsibility.fieldsGroupsFiles.relatedByOperator')::getTracedFieldsGroup();
 	}
 
 	public function getIndexElements()
