@@ -20,6 +20,7 @@ class ClientOperatorResponsibilityFieldsGroupParametersFile extends FieldsGroupP
 
 				'clientOperator.operator.name' => 'flat',
 				'clientOperator.client.name' => 'flat',
+				'responsibility.common_responsibility' => 'flat',
 				'responsibility.description' => 'flat',
 
 				'created_at' => 'dates.date'

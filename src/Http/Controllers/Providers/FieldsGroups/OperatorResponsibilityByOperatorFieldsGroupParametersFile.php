@@ -16,6 +16,7 @@ class OperatorResponsibilityByOperatorFieldsGroupParametersFile extends FieldsGr
 					'type' => 'links.link',
 					'function' => 'getCalculateUrl',
 				],
+				'responsibility.common_responsibility' => 'flat',
 				'responsibility.description' => 'flat',
 				'completed_at' => 'dates.date',
 				'valid_to' => 'dates.date',

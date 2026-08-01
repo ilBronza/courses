@@ -3,6 +3,7 @@
 namespace IlBronza\Courses\Helpers\OperatorCourses;
 
 use Carbon\Carbon;
+use IlBronza\Courses\Models\Course;
 use IlBronza\Courses\Models\OperatorResponsibility;
 use Illuminate\Support\Collection;
 
@@ -56,6 +57,15 @@ abstract class OperatorCourseValidithHelperGeneral
 	public function getCourseSessions() : Collection
 	{
 		dd('da implementare qua poi');
+	}
+
+	public function addValidityToDate(Carbon $date, string $courseId) : Carbon
+	{
+		$course = Course::gpc()::findCachedByField('old_course_id', $courseId);
+
+		$newDate = $date->copy();
+
+		return $newDate->addMonths($course->validity_months);
 	}
 
 	public function setValidWithDate(Carbon $date)

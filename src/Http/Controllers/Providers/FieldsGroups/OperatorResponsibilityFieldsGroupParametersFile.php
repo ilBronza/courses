@@ -22,6 +22,7 @@ class OperatorResponsibilityFieldsGroupParametersFile extends FieldsGroupParamet
 				],
 
 				'operator.name' => 'flat',
+				'responsibility.common_responsibility' => 'flat',
 				'responsibility.description' => 'flat',
 
 				'completed_at' => 'dates.date',
