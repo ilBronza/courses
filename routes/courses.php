@@ -5,7 +5,8 @@ use IlBronza\Courses\Courses;
 Route::group([
 	'middleware' => ['web', 'auth', 'courses.roles'],
 	'prefix' => 'courses-management',
-	'as' => config('courses.routePrefix')
+	'as' => config('courses.routePrefix'),
+	'routeTranslationPrefix' => Courses::getRouteTranslationPrefix(),
 	],
 	function()
 	{
