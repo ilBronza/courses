@@ -8,6 +8,7 @@ return [
 	'alias' => 'Alias',
 	'common_alias' => 'Alias comune',
 	'common_responsibility' => 'Responsabilità comune',
+	'responsibility.common_responsibility' => 'Responsabilità comune',
 	'description' => 'Descrizione',
 	'description_subscribed' => 'Descrizione per iscritti',
 	'note' => 'Note',
@@ -20,6 +21,9 @@ return [
 	'makes_expiration_valid' => 'Rende valida la scadenza',
 	'cumulative_hours' => 'Ore cumulative',
 	'e_learning' => 'E-learning',
+	'required_valid_course_ids' => 'Corsi già validi richiesti',
+	'expiration_target_course_ids' => 'Corsi verso cui indirizzare alla scadenza',
+	'course_id' => 'Corso',
 	'calculate' => 'Calcola',
 	'operator_id' => 'Operatore',
 	'responsibility_id' => 'Responsabilità',
@@ -27,6 +31,7 @@ return [
 
 	'durationParameters' => 'Durata e prezzo',
 	'optionsParameters' => 'Opzioni',
+	'validityRelationsParameters' => 'Relazioni di validità',
 
 	'operator_responsibilities_count' => 'Responsabilità operatore',
 	'client_operator_responsibilities_count' => 'Responsabilità per rapporto di lavoro',
@@ -39,6 +44,13 @@ return [
 	'completed_at' => 'Completata il',
 	'valid_to' => 'Valida fino al',
 	'valid' => 'Valida',
+	'assumed' => 'Dedotta dai corsi',
 	'parsed_at' => 'Verificata il',
 	'created_at' => 'Creata il',
+
+	'operator_name' => 'Operatore',
+	'client_name' => 'Cliente',
+	'responsibility_name' => 'Mansione',
+	'expires_at' => 'Scadenza',
+
 ];

@@ -21,6 +21,8 @@ class Course extends CoursesPackageBaseModel
 		'user_area_order' => 'integer',
 		'cumulative_hours' => 'boolean',
 		'e_learning' => 'boolean',
+		'required_valid_course_ids' => 'array',
+		'expiration_target_course_ids' => 'array',
 	];
 
 	static $modelConfigPrefix = 'course';

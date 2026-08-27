@@ -2,12 +2,27 @@
 
 namespace IlBronza\Courses\Http\Controllers\Providers\Fieldsets;
 
+use IlBronza\Courses\Models\Course;
 use IlBronza\Form\Helpers\FieldsetsProvider\FieldsetParametersFile;
 
 class CourseEditUpdateFieldsetsParameters extends FieldsetParametersFile
 {
+	public function getSelectableCoursesArray() : array
+	{
+		$courseClass = Course::gpc();
+		$query = $courseClass::query()->orderBy('name');
+
+		if($courseId = $this->getModel()?->getKey())
+			$query->where($query->getModel()->getKeyName(), '!=', $courseId);
+
+		return $query->pluck('name', 'id')->all();
+	}
+
 	public function _getFieldsetsParameters() : array
 	{
+		$selectableCourses = $this->getSelectableCoursesArray();
+		$courseTable = config('courses.models.course.table');
+
 		return [
 			'baseParameters' => [
 				'translationPrefix' => 'courses::fields',
@@ -39,6 +54,38 @@ class CourseEditUpdateFieldsetsParameters extends FieldsetParametersFile
 					'makes_expiration_valid' => ['boolean' => 'boolean|nullable'],
 					'cumulative_hours' => ['boolean' => 'boolean|nullable'],
 					'e_learning' => ['boolean' => 'boolean|nullable'],
+				],
+				'width' => ['large'],
+			],
+			'validityRelationsParameters' => [
+				'translationPrefix' => 'courses::fields',
+				'fields' => [
+					'required_valid_course_ids' => [
+						'type' => 'json',
+						'fields' => [
+							'course_id' => [
+								'type' => 'select',
+								'select2' => false,
+								'multiple' => false,
+								'possibleValuesArray' => $selectableCourses,
+								'rules' => 'string|required|exists:' . $courseTable . ',id',
+							],
+						],
+						'rules' => 'array|nullable',
+					],
+					'expiration_target_course_ids' => [
+						'type' => 'json',
+						'fields' => [
+							'course_id' => [
+								'type' => 'select',
+								'multiple' => false,
+								'select2' => false,
+								'possibleValuesArray' => $selectableCourses,
+								'rules' => 'string|required|exists:' . $courseTable . ',id',
+							],
+						],
+						'rules' => 'array|nullable',
+					],
 				],
 				'width' => ['large'],
 			],
