@@ -4,6 +4,7 @@ namespace IlBronza\Courses;
 
 use IlBronza\CRUD\Providers\RouterProvider\RoutedObjectInterface;
 use IlBronza\CRUD\Traits\IlBronzaPackages\IlBronzaPackagesTrait;
+use IlBronza\Courses\Models\Course;
 use IlBronza\Courses\Models\Responsibility;
 
 class Courses implements RoutedObjectInterface
@@ -27,6 +28,21 @@ class Courses implements RoutedObjectInterface
 			->all();
 	}
 
+	public function getCourseNeedsChildren() : array
+	{
+		return Course::gpc()::query()
+			->pluck('alias')
+			->sort(SORT_NATURAL | SORT_FLAG_CASE)
+			->values()
+			->map(fn (string $alias) => [
+				'name' => 'courseNeeds.index.' . $alias,
+				'icon' => 'graduation-cap',
+				'text' => $alias,
+				'href' => $this->route('courseNeeds.index', ['alias' => $alias]),
+			])
+			->all();
+	}
+
 	public function manageMenuButtons()
 	{
 		if(! $menu = app('menu'))
@@ -46,6 +62,15 @@ class Courses implements RoutedObjectInterface
 				'icon' => 'graduation-cap',
 				'text' => 'courses::courses.courses',
 				'href' => $this->route('courses.index')
+			])
+		);
+
+		$coursesManagerButton->addChild(
+			$menu->createButton([
+				'name' => 'courseNeeds',
+				'icon' => 'list-check',
+				'text' => 'courses::courses.courseNeedsSituation',
+				'children' => $this->getCourseNeedsChildren(),
 			])
 		);
 

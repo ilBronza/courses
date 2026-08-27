@@ -24,6 +24,11 @@ Route::group(['prefix' => 'courses'], function()
 	Route::delete('{course}/delete', [Courses::getController('course', 'destroy'), 'destroy'])->name('courses.destroy');
 });
 
+Route::group(['prefix' => 'course-needs'], function()
+{
+	Route::get('{alias}', [Courses::getController('courseNeed', 'index'), 'index'])->name('courseNeeds.index');
+});
+
 Route::group(['prefix' => 'responsibilities'], function()
 {
 	Route::get('', [Courses::getController('responsibility', 'index'), 'index'])->name('responsibilities.index');

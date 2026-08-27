@@ -4,6 +4,9 @@ return [
 	'coursesManager' => 'Gestione corsi',
 	'courses' => 'Corsi',
 	'course' => 'Corso',
+	'courseNeeds' => 'Fabbisogni corso',
+	'courseNeed' => 'Fabbisogno corso',
+	'courseNeedsSituation' => 'Situazione corsi',
 	'courseSessions' => 'Edizioni',
 	'courseSession' => 'Edizione',
 	'dates' => 'Giornate',
@@ -20,4 +23,5 @@ return [
 	'operatorResponsibility' => 'Responsabilità operatore',
 	'attendances' => 'Presenze',
 	'attendance' => 'Presenza',
+
 ];

@@ -1,6 +1,7 @@
 <?php
 
 use IlBronza\Courses\Http\Controllers\ClientOperatorResponsibilities\ClientOperatorResponsibilityIndexController;
+use IlBronza\Courses\Http\Controllers\CourseNeeds\CourseNeedIndexController;
 use IlBronza\Courses\Http\Controllers\Courses\CourseCreateStoreController;
 use IlBronza\Courses\Http\Controllers\Courses\CourseDestroyController;
 use IlBronza\Courses\Http\Controllers\Courses\CourseEditUpdateController;
@@ -18,6 +19,7 @@ use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\ClientOperatorRespo
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\ClientOperatorResponsibilityByClientOperatorFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\ClientOperatorResponsibilityByResponsibilityFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\CourseFieldsGroupParametersFile;
+use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\CourseNeedFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\OperatorResponsibilityByOperatorFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\OperatorResponsibilityByResponsibilityFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\OperatorResponsibilityFieldsGroupParametersFile;
@@ -39,6 +41,7 @@ use IlBronza\Courses\Models\ClientOperatorResponsibility;
 use IlBronza\Courses\Models\Company;
 use IlBronza\Courses\Models\CompanyWorker;
 use IlBronza\Courses\Models\Course;
+use IlBronza\Courses\Models\CourseNeed;
 use IlBronza\Courses\Models\CourseSession;
 use IlBronza\Courses\Models\CourseSessionDateSession;
 use IlBronza\Courses\Models\CourseWorker;
@@ -89,6 +92,22 @@ return [
 				'edit' => CourseEditUpdateController::class,
 				'update' => CourseEditUpdateController::class,
 				'destroy' => CourseDestroyController::class,
+			],
+			'helpers' => [
+				//classi che estendono CourseNeedsHelperGeneral, dichiarate dall'applicazione
+				'needs' => [
+					// 'FL_G' => \App\Helpers\Courses\Needs\FlgCourseNeedsHelper::class,
+				],
+			],
+		],
+		'courseNeed' => [
+			'table' => 'courses__course_needs',
+			'class' => CourseNeed::class,
+			'fieldsGroupsFiles' => [
+				'index' => CourseNeedFieldsGroupParametersFile::class,
+			],
+			'controllers' => [
+				'index' => CourseNeedIndexController::class,
 			],
 		],
 		'company' => [

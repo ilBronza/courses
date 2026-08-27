@@ -11,6 +11,9 @@ return [
 			'update' => 'Aggiorna corso',
 			'destroy' => 'Elimina corso',
 		],
+		'courseNeeds' => [
+			'index' => 'Fabbisogni corso',
+		],
 		'responsibilities' => [
 			'index' => 'Responsabilità',
 			'calculate' => 'Calcola responsabilità',
