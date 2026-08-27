@@ -14,7 +14,7 @@ class ClientOperatorResponsibilityByClientOperatorFieldsGroupParametersFile exte
 				'mySelfPrimary' => 'primary',
 				'mySelfCalculate' => [
 					'type' => 'links.link',
-					'function' => 'getCalculateUrl',
+					'function' => 'getCalculateResponsibilityUrl',
 				],
 				'responsibility.common_responsibility' => 'flat',
 				'responsibility.description' => 'flat',

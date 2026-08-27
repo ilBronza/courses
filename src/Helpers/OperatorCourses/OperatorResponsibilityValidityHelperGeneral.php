@@ -7,10 +7,11 @@ use IlBronza\Courses\Models\Course;
 use IlBronza\Courses\Models\OperatorResponsibility;
 use Illuminate\Support\Collection;
 
-abstract class OperatorCourseValidithHelperGeneral
+abstract class OperatorResponsibilityValidityHelperGeneral
 {
 	static string $responsibility;
 	public array $problems = [];
+	public ? Carbon $expiredAt = null;
 
 	abstract protected function handle();
 
@@ -84,7 +85,7 @@ abstract class OperatorCourseValidithHelperGeneral
 		$operatorResponsibility = $this->getOperatorResponsibility();
 
 		$operatorResponsibility->valid = false;
-		$operatorResponsibility->valid_to = null;
+		$operatorResponsibility->valid_to = $this->expiredAt;
 		$operatorResponsibility->parsed_at = Carbon::now();
 		$operatorResponsibility->errors = implode(" | ", $this->problems);
 		$operatorResponsibility->save();

@@ -28,7 +28,7 @@ trait ClientOperatorUsesCoursesTrait
 		return $this->responsibilities;
 	}
 
-	public function getCalculateUrl() : string
+	public function getCalculateResponsibilityUrl() : string
 	{
 		return route('ibCourses.clientOperators.calculateResponsibilities', [
 			'clientOperator' => $this->getKey(),

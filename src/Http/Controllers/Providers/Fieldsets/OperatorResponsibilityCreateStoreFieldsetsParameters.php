@@ -26,6 +26,7 @@ class OperatorResponsibilityCreateStoreFieldsetsParameters extends FieldsetParam
 						'rules' => 'string|required|exists:' . config('courses.models.responsibility.table') . ',id',
 						'relation' => 'responsibility',
 					],
+					'assumed' => ['boolean' => 'boolean|nullable'],
 					'completed_at' => ['date' => 'date|nullable'],
 				],
 				'width' => ['large'],

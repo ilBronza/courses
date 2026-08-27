@@ -17,7 +17,7 @@ class ResponsibilityFieldsGroupParametersFile extends FieldsGroupParametersFile
 				'mySelfSee' => 'links.see',
 				'mySelfCalculate' => [
 					'type' => 'links.link',
-					'function' => 'getCalculateUrl',
+					'function' => 'getCalculateResponsibilityUrl',
 				],
 				'id' => 'flat',
 				'common_responsibility' => 'flat',

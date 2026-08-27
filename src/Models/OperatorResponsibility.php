@@ -21,9 +21,10 @@ class OperatorResponsibility extends CoursesPackageBasePivotModel
 		'valid_to' => 'datetime',
 		'parsed_at' => 'datetime',
 		'valid' => 'boolean',
+		'assumed' => 'boolean',
 	];
 
-	public function getCalculateUrl() : string
+	public function getCalculateResponsibilityUrl() : string
 	{
 		return $this->getKeyedRoute('calculateByOperatorResponsibility');
 	}

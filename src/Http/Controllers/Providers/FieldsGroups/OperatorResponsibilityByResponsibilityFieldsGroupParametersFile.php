@@ -15,10 +15,11 @@ class OperatorResponsibilityByResponsibilityFieldsGroupParametersFile extends Fi
 				'mySelfPrimary' => 'primary',
 				'mySelfCalculate' => [
 					'type' => 'links.link',
-					'function' => 'getCalculateUrl',
+					'function' => 'getCalculateResponsibilityUrl',
 				],
 
 				'operator.name' => 'flat',
+				'assumed' => 'boolean',
 				'completed_at' => 'dates.date',
 				'valid_to' => 'dates.date',
 				'valid' => 'boolean',

@@ -33,9 +33,9 @@ Il package contiene l’infrastruttura generica; l’applicazione ospitante (`Ec
 | --- | --- |
 | Modello di una responsabilità assegnata a un operatore | `src/Models/OperatorResponsibility.php` |
 | Scope Eloquent della responsabilità | `src/Traits/Models/OperatorResponsibilityScopesTrait.php` |
-| Motore comune di un helper | `src/Helpers/OperatorCourses/OperatorCourseValidithHelperGeneral.php` |
+| Motore comune di un helper | `src/Helpers/OperatorCourses/OperatorResponsibilityValidityHelperGeneral.php` |
 | Elaborazione batch delle responsabilità non ancora calcolate | `src/Helpers/OperatorResponsibilities/OperatorResponsibilityValidityHelper.php` |
-| Helper base dell’app, che legge i corsi legacy | Applicazione ospitante: `app/Helpers/Courses/Validity/OperatorCourseValidithHelperBase.php` |
+| Helper base dell’app, che legge i corsi legacy | Applicazione ospitante: `app/Helpers/Courses/Validity/OperatorResponsibilityValidityHelperBase.php` |
 | Mappa `responsabilità → helper` dell’app | Applicazione ospitante: `config/courses.php` |
 | Elaborazione delle responsabilità di un solo operatore | Applicazione ospitante: `app/Helpers/Courses/Validity/OperatorGeneralResponsibilityValidityHelper.php` |
 
@@ -55,7 +55,7 @@ Una `OperatorResponsibility` non è il completamento di un singolo corso: è lo 
 
 ## Dati usati dagli helper
 
-Nell’integrazione Ecostudio, `OperatorCourseValidithHelperBase` recupera i record `CourseWorker` tramite l’ID del worker legacy dell’operatore:
+Nell’integrazione Ecostudio, `OperatorResponsibilityValidityHelperBase` recupera i record `CourseWorker` tramite l’ID del worker legacy dell’operatore:
 
 ```php
 CourseWorker::byWorker($operator->getWorkerId())->get();
@@ -88,10 +88,10 @@ $this->setNotValid();
 
 ### Una responsabilità singola
 
-Ogni helper estende `OperatorCourseValidithHelperGeneral`, quindi può essere invocato direttamente con il record da calcolare:
+Ogni helper estende `OperatorResponsibilityValidityHelperGeneral`, quindi può essere invocato direttamente con il record da calcolare:
 
 ```php
-OperatorCourseValidithHelperFL::parse($operatorResponsibility);
+OperatorResponsibilityValidityHelperFL::parse($operatorResponsibility);
 ```
 
 ### Tutte le responsabilità di un operatore
@@ -111,7 +111,7 @@ L’helper percorre `$operator->operatorResponsibilities`, trova la classe confi
 Ogni helper concreto dichiara `static string $responsibility`, per esempio `FL`. Il metodo ereditato può ricalcolare tutti gli operatori che hanno quella tipologia:
 
 ```php
-OperatorCourseValidithHelperFL::parseByResponsibility();
+OperatorResponsibilityValidityHelperFL::parseByResponsibility();
 ```
 
 Il flusso è:
@@ -143,14 +143,14 @@ Le classi effettivamente mappate sono definite nel `config/courses.php` dell’a
 
 | Responsabilità | Helper | Stato / regola |
 | --- | --- | --- |
-| `FL` | `OperatorCourseValidithHelperFL` | Implementato. Vedi la sezione dedicata. |
-| `PRI` | `OperatorCourseValidithHelperPRI` | Implementato con una regola transitoria specifica. |
-| `ANT` | `OperatorCourseValidithHelperANT` | Implementato con base + aggiornamento. |
-| `ANT2` | `OperatorCourseValidithHelperANT2` | Implementato con base + aggiornamento. |
-| `ANT3` | `OperatorCourseValidithHelperANT3` | Implementato con base + aggiornamento. |
-| `PREP` | `OperatorCourseValidithHelperPREP` | Implementato con base + aggiornamento. |
-| `PS` | `OperatorCourseValidithHelperPS` | Implementato con base + aggiornamento. |
-| `DL` | `OperatorCourseValidithHelperDL` | Implementato con base + aggiornamento. |
+| `FL` | `OperatorResponsibilityValidityHelperFL` | Implementato. Vedi la sezione dedicata. |
+| `PRI` | `OperatorResponsibilityValidityHelperPRI` | Implementato con una regola transitoria specifica. |
+| `ANT` | `OperatorResponsibilityValidityHelperANT` | Implementato con base + aggiornamento. |
+| `ANT2` | `OperatorResponsibilityValidityHelperANT2` | Implementato con base + aggiornamento. |
+| `ANT3` | `OperatorResponsibilityValidityHelperANT3` | Implementato con base + aggiornamento. |
+| `PREP` | `OperatorResponsibilityValidityHelperPREP` | Implementato con base + aggiornamento. |
+| `PS` | `OperatorResponsibilityValidityHelperPS` | Implementato con base + aggiornamento. |
+| `DL` | `OperatorResponsibilityValidityHelperDL` | Implementato con base + aggiornamento. |
 | `DIR`, `FL_S_EL`, `RSPP`, `RLS`, `COVID-AMBULATORI`, `HACCP_*` | rispettivi helper | Placeholder: l’`handle()` ritorna subito e non salva alcun esito. Non sono validazioni operative. |
 
 ### FL — formazione lavoratori
@@ -204,7 +204,7 @@ Questa è una regola transitoria codificata nell’helper, da rivalutare prima d
 
 ### Famiglia base + aggiornamento
 
-`ANT`, `ANT2`, `ANT3`, `PREP`, `PS` e `DL` estendono `OperatorCourseValidithHelperBasePlusAgg` e usano la stessa struttura.
+`ANT`, `ANT2`, `ANT3`, `PREP`, `PS` e `DL` estendono `OperatorResponsibilityValidityHelperBasePlusAgg` e usano la stessa struttura.
 
 Ogni classe dichiara:
 
@@ -241,7 +241,7 @@ Il controllo delle colonne `completion_ps_t1` e `completion_ps_t2` è nel base h
 ## Aggiungere una nuova responsabilità
 
 1. Creare un helper in `app/Helpers/Courses/Validity/` dell’applicazione ospitante.
-2. Estendere `OperatorCourseValidithHelperBase` oppure `OperatorCourseValidithHelperBasePlusAgg` se la regola è realmente quella base + aggiornamento.
+2. Estendere `OperatorResponsibilityValidityHelperBase` oppure `OperatorResponsibilityValidityHelperBasePlusAgg` se la regola è realmente quella base + aggiornamento.
 3. Impostare la chiave, gli alias dei corsi letti e la logica di `handle()`.
 4. Registrare la chiave in `config/courses.php` dell’applicazione ospitante sotto `models.responsibility.helpers.validity`.
 5. Preparare casi con corso assente, corso incompleto, corso scaduto e corso valido.
@@ -249,7 +249,7 @@ Il controllo delle colonne `completion_ps_t1` e `completion_ps_t2` è nel base h
 Esempio minimale:
 
 ```php
-class OperatorCourseValidithHelperXYZ extends OperatorCourseValidithHelperBase
+class OperatorResponsibilityValidityHelperXYZ extends OperatorResponsibilityValidityHelperBase
 {
     static string $responsibility = 'XYZ';
 
@@ -285,6 +285,6 @@ php -l percorso/del/file.php
 
 ## Limiti noti
 
-- `OperatorCourseValidithHelperGeneral::getCourseSessions()` nel package contiene un `dd()` intenzionale: gli helper dell’app devono passare da `OperatorCourseValidithHelperBase`, che lo sostituisce con il recupero corretto dei `CourseWorker` legacy.
+- `OperatorResponsibilityValidityHelperGeneral::getCourseSessions()` nel package contiene un `dd()` intenzionale: gli helper dell’app devono passare da `OperatorResponsibilityValidityHelperBase`, che lo sostituisce con il recupero corretto dei `CourseWorker` legacy.
 - Gli helper placeholder elencati nella tabella non producono alcun esito; lasciarli mappati può far sembrare che una responsabilità sia stata elaborata quando non è successo nulla.
 - Il package non contiene ancora una suite automatizzata di test per queste regole. Ogni nuova logica va prima verificata con una matrice di casi reali o fixture dedicate.

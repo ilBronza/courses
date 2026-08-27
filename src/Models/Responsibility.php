@@ -10,7 +10,7 @@ class Responsibility extends CoursesPackageBaseModel
 
 	static $modelConfigPrefix = 'responsibility';
 
-	public function getCalculateUrl() : string
+	public function getCalculateResponsibilityUrl() : string
 	{
 		return $this->getKeyedRoute('calculateByResponsibility');
 	}

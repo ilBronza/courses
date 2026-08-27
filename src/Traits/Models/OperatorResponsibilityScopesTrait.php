@@ -21,6 +21,16 @@ trait OperatorResponsibilityScopesTrait
 		return $query->whereNull('parsed_at');
 	}
 
+	public function scopeAssumed(Builder $query) : Builder
+	{
+		return $query->where('assumed', true);
+	}
+
+	public function scopeNotAssumed(Builder $query) : Builder
+	{
+		return $query->where('assumed', false);
+	}
+
 	public function scopeValid(Builder $query) : Builder
 	{
 		return $query->where('valid', true);

@@ -14,7 +14,7 @@ class ClientOperatorResponsibility extends CoursesPackageBasePivotModel
 	static $modelConfigPrefix = 'clientOperatorResponsibility';
 	static $deletingRelationships = [];
 
-	public function getCalculateUrl() : string
+	public function getCalculateResponsibilityUrl() : string
 	{
 		return $this->getKeyedRoute('calculate');
 	}

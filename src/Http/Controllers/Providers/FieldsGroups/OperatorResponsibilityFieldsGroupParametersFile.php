@@ -15,15 +15,11 @@ class OperatorResponsibilityFieldsGroupParametersFile extends FieldsGroupParamet
 				'mySelfPrimary' => 'primary',
 				'mySelfEdit' => 'links.edit',
 				'mySelfSee' => 'links.see',
-				'mySelfCalculate' => [
-					'type' => 'links.ajaxUrl',
-					'faIcon' => 'calendar-check',
-					'function' => 'getCalculateUrl',
-				],
-
+				'mySelfCalculate' => 'courses::calculate',
 				'operator.name' => 'flat',
 				'responsibility.common_responsibility' => 'flat',
 				'responsibility.description' => 'flat',
+				'assumed' => 'boolean',
 
 				'completed_at' => 'dates.date',
 				'valid_to' => 'dates.date',
