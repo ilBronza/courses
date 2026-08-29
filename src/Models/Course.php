@@ -3,6 +3,8 @@
 namespace IlBronza\Courses\Models;
 
 use IlBronza\Courses\Models\CoursesPackageBaseModel;
+use IlBronza\Courses\Models\Responsibility;
+use Illuminate\Database\Eloquent\Builder;
 
 class Course extends CoursesPackageBaseModel
 {
@@ -26,4 +28,36 @@ class Course extends CoursesPackageBaseModel
 	];
 
 	static $modelConfigPrefix = 'course';
+
+	public function scopeByAlias(Builder $query, string $alias): Builder
+	{
+		return $query->where('alias', $alias);
+	}
+
+	public function scopeCompulsory(Builder $query): Builder
+	{
+		return $query->where('compulsory', true);
+	}
+
+	public function scopeOptional(Builder $query): Builder
+	{
+		return $query->where(function (Builder $query) {
+			$query->where('compulsory', false)->orWhereNull('compulsory');
+		});
+	}
+
+	public function scopeByResponsibility(Builder $query, string $responsibility): Builder
+	{
+		return $query->where('common_alias', $responsibility);
+	}
+
+	public function responsibility()
+	{
+		return $this->belongsTo(Responsibility::gpc(), 'common_alias');
+	}
+
+	public function getResponsibility() : Responsibility
+	{
+		return $this->responsibility;
+	}
 }
