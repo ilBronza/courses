@@ -3,170 +3,57 @@
 namespace IlBronza\Courses\Helpers\CourseNeeds;
 
 use IlBronza\Courses\Models\Course;
-use IlBronza\Courses\Models\ClientOperatorResponsibility;
-use IlBronza\Courses\Models\CourseNeed;
+use IlBronza\Courses\Models\Responsibility;
 use Illuminate\Support\Collection;
 
-/**
- * Base class for application-level helpers that generate a course-needs collection.
- */
 abstract class CourseNeedsHelperGeneral
 {
-	public function getCollection() : Collection
+	public string $courseAlias;
+	public Course $course;
+	public Responsibility $responsibility;
+	public Collection $courseNeeds;
+
+	public function __construct($courseAlias)
 	{
-		$course = $this->getCourse();
-		$clientOperatorResponsibilities = $this->getClientOperatorResponsibilities(
-			$this->getResponsibility()
-		);
-		$courseWorkersByWorkerId = $this->getCourseWorkersByWorkerId(
-			$clientOperatorResponsibilities,
-			$course->old_course_id
-		);
-		$clientOperatorResponsibilitiesWithoutValidCourseWorker = $this->getClientOperatorResponsibilitiesWithoutValidCourseWorker(
-			$clientOperatorResponsibilities,
-			$courseWorkersByWorkerId
-		);
+		ini_set('memory_limit', '-1');
 
-		return $this->createCourseNeeds(
-			$clientOperatorResponsibilitiesWithoutValidCourseWorker,
-			$courseWorkersByWorkerId
-		);
+		$this->courseNeeds = collect();
+		$this->courseAlias = $courseAlias;
+
+		$this->setCourse();
+		$this->setResponsibility();
 	}
 
-	/**
-	 * Create a helper for the course identified by the alias.
-	 */
-	public function __construct(
-		protected string $alias
-	) {
-	}
+	abstract public function getCollection() : Collection;
 
-	/**
-	 * Return the alias associated with this helper instance.
-	 */
-	protected function getAlias() : string
+	public function setCourse()
 	{
-		return $this->alias;
+		$this->course = Course::gpc()::byAlias($this->getCourseAlias())->first();
 	}
 
-	/**
-	 * Return the course associated with this helper alias.
-	 */
-	protected function getCourse() : Course
+	public function getCourse() : Course
 	{
-		return Course::gpc()::findCachedByField('alias', $this->getAlias());
+		return $this->course;
 	}
 
-	protected function getResponsibility() : string
+	public function getResponsibilityAlias() : string
 	{
-		return $this->getCourse()->common_alias;
+		return $this->getResponsibility()->getKey();
 	}
 
-	protected function getClientOperatorResponsibilities(string $responsibility) : Collection
+	public function setResponsibility()
 	{
-		return ClientOperatorResponsibility::gpc()::query()
-			->where('responsibility_id', $responsibility)
-			->with([
-				'clientOperator.operator',
-				'clientOperator.client',
-			])
-			->get()
-			->filter(fn (ClientOperatorResponsibility $clientOperatorResponsibility) =>
-				$this->getWorkerId($clientOperatorResponsibility)
-			)
-			->values();
+		$this->responsibility = $this->getCourse()->getResponsibility();
 	}
 
-	abstract protected function getWorkerId(
-		ClientOperatorResponsibility $clientOperatorResponsibility
-	) : int|string|null;
-
-	abstract protected function getCourseWorkersByWorkerId(
-		Collection $clientOperatorResponsibilities,
-		int $courseId
-	) : Collection;
-
-	protected function getClientOperatorResponsibilitiesWithoutValidCourseWorker(
-		Collection $clientOperatorResponsibilities,
-		Collection $courseWorkersByWorkerId
-	) : Collection
+	public function getResponsibility() : Responsibility
 	{
-		return $clientOperatorResponsibilities
-			->reject(function (ClientOperatorResponsibility $clientOperatorResponsibility) use ($courseWorkersByWorkerId)
-			{
-				return $this->hasValidCourseWorker(
-					$courseWorkersByWorkerId->get(
-						$this->getWorkerId($clientOperatorResponsibility),
-						collect()
-					)
-				);
-			})
-			->values();
+		return $this->responsibility;
 	}
 
-	protected function hasValidCourseWorker(Collection $courseWorkers) : bool
+	public function getCourseAlias() : string
 	{
-		return $courseWorkers->contains(function ($courseWorker)
-		{
-			$expirationDate = $courseWorker->calculated_expiring_date;
-
-			return $expirationDate?->isToday() || $expirationDate?->isFuture();
-		});
+		return $this->courseAlias;
 	}
 
-	protected function createCourseNeeds(
-		Collection $clientOperatorResponsibilities,
-		Collection $courseWorkersByWorkerId
-	) : Collection
-	{
-		return $clientOperatorResponsibilities
-			->map(fn (ClientOperatorResponsibility $clientOperatorResponsibility) =>
-				$this->createCourseNeedFromClientOperatorResponsibility(
-					$clientOperatorResponsibility,
-					$courseWorkersByWorkerId
-				)
-			)
-			->values();
-	}
-
-	protected function createCourseNeedFromClientOperatorResponsibility(
-		ClientOperatorResponsibility $clientOperatorResponsibility,
-		Collection $courseWorkersByWorkerId
-	) : CourseNeed
-	{
-		$clientOperator = $clientOperatorResponsibility->clientOperator;
-		$operator = $clientOperator->operator;
-		$latestCourseWorker = $this->getLatestCourseWorker(
-			$courseWorkersByWorkerId->get(
-				$this->getWorkerId($clientOperatorResponsibility),
-				collect()
-			)
-		);
-
-		return $this->createCourseNeed([
-			'id' => $clientOperatorResponsibility->getKey(),
-			'operator_name' => $operator->getName(),
-			'client_name' => $clientOperator->client?->getName(),
-			'responsibility_name' => $clientOperatorResponsibility->getResponsibilityName(),
-			'expires_at' => $latestCourseWorker?->calculated_expiring_date,
-			'note' => $latestCourseWorker?->notes ?: 'Corso assente o non valido',
-		]);
-	}
-
-	protected function getLatestCourseWorker(Collection $courseWorkers)
-	{
-		return $courseWorkers
-			->sortByDesc('calculated_expiring_date')
-			->first();
-	}
-
-	/**
-	 * Create an in-memory course-need model for the result collection.
-	 *
-	 * @param array<string, mixed> $attributes
-	 */
-	protected function createCourseNeed(array $attributes) : CourseNeed
-	{
-		return CourseNeed::gpc()::make($attributes);
-	}
 }
