@@ -3,6 +3,7 @@
 namespace IlBronza\Courses;
 
 use IlBronza\CRUD\Traits\IlBronzaPackages\IlBronzaServiceProviderPackagesTrait;
+use IlBronza\Courses\Console\Commands\CalculateOperatorResponsibilitiesValidity;
 use IlBronza\Courses\Console\Commands\SyncOldCourses;
 use IlBronza\Courses\Http\Middleware\CoursesRoleMiddleware;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +29,7 @@ class CoursesServiceProvider extends ServiceProvider
 		if ($this->app->runningInConsole())
 		{
 			$this->commands([
+				CalculateOperatorResponsibilitiesValidity::class,
 				SyncOldCourses::class,
 			]);
 
