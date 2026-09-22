@@ -47,6 +47,8 @@ Route::group(['prefix' => 'responsibilities'], function()
 Route::group(['prefix' => 'operator-responsibilities'], function()
 {
 	Route::get('', [Courses::getController('operatorResponsibility', 'index'), 'index'])->name('operatorResponsibilities.index');
+
+	//OperatorResponsibilityCalculationController
 	Route::get('calculate', [Courses::getController('operatorResponsibility', 'calculate'), 'calculateAll'])->name('operatorResponsibilities.calculate');
 	Route::get('create', [Courses::getController('operatorResponsibility', 'create'), 'create'])->name('operatorResponsibilities.create');
 
@@ -57,6 +59,8 @@ Route::group(['prefix' => 'operator-responsibilities'], function()
 	Route::post('', [Courses::getController('operatorResponsibility', 'store'), 'store'])->name('operatorResponsibilities.store');
 
 	Route::get('{operatorResponsibility}', [Courses::getController('operatorResponsibility', 'show'), 'show'])->name('operatorResponsibilities.show');
+
+	//OperatorResponsibilityCalculationController
 	Route::get('{operatorResponsibility}/calculate', [Courses::getController('operatorResponsibility', 'calculate'), 'calculateByOperatorResponsibility'])->name('operatorResponsibilities.calculateByOperatorResponsibility');
 	Route::get('{operatorResponsibility}/edit', [Courses::getController('operatorResponsibility', 'edit'), 'edit'])->name('operatorResponsibilities.edit');
 	Route::put('{operatorResponsibility}', [Courses::getController('operatorResponsibility', 'update'), 'update'])->name('operatorResponsibilities.update');

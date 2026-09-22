@@ -3,10 +3,12 @@
 namespace IlBronza\Courses\Models;
 
 use IlBronza\Courses\Traits\Models\ResponsibilityRelationsTrait;
+use IlBronza\CRUD\Traits\Model\CRUDArchiverTrait;
 use Illuminate\Database\Eloquent\Builder;
 
 class Responsibility extends CoursesPackageBaseModel
 {
+	use CRUDArchiverTrait;
 	use ResponsibilityRelationsTrait;
 
 	static $modelConfigPrefix = 'responsibility';

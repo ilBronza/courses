@@ -39,6 +39,9 @@ class CourseNeedIndexController extends CourseNeedCRUD
 	 */
 	public function getIndexElements() : Collection
 	{
+		ini_set('max_execution_time', '120');
+		ini_set('memory_limit', '-1');
+
 		$helperClass = cconfig('courses.models.course.helpers.needs.' . request()->alias);
 
 		return (new $helperClass(request()->alias))->getCollection();

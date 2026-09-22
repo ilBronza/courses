@@ -4,10 +4,13 @@ namespace IlBronza\Courses\Models;
 
 use IlBronza\Courses\Models\CoursesPackageBaseModel;
 use IlBronza\Courses\Models\Responsibility;
+use IlBronza\CRUD\Traits\Model\CRUDArchiverTrait;
 use Illuminate\Database\Eloquent\Builder;
 
 class Course extends CoursesPackageBaseModel
 {
+	use CRUDArchiverTrait;
+
 	protected $casts = [
 		'old_course_id' => 'integer',
 		'validity_months' => 'integer',
