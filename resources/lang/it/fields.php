@@ -1,6 +1,19 @@
 <?php
 
 return [
+	'programParameters' => 'Programma della tematica',
+	'program' => 'Lezioni — il totale di ogni tipologia deve coincidere con quello del corso',
+	'program_requirements' => 'Ore obbligatorie per tipologia',
+	'program_status' => 'Stato del programma',
+	'date_id' => 'Tipologia di data',
+	'type_name' => 'Tipologia di data',
+	'course_theme_id' => 'Tematica',
+	'courseTheme.name' => 'Tematica',
+	'courseSession.name' => 'Edizione',
+	'desired_start_date' => 'Inizio previsto',
+	'desired_end_date' => 'Fine prevista',
+	'starts_at' => 'Giorno e ora di inizio',
+	'sorting_index' => 'Ordine',
 	'baseParameters' => 'Dati base',
 
 	'id' => 'Sigla',
@@ -24,6 +37,11 @@ return [
 	'required_valid_course_ids' => 'Corsi già validi richiesti',
 	'expiration_target_course_ids' => 'Corsi verso cui indirizzare alla scadenza',
 	'course_id' => 'Corso',
+	'course.name' => 'Corso',
+	'ateco' => 'Codici ATECO',
+	'ateco_code' => 'Codice ATECO',
+	'ateco_codes' => 'Codici ATECO',
+	'atecoParameters' => 'Aziende destinatarie',
 	'calculate' => 'Calcola',
 	'operator_id' => 'Operatore',
 	'responsibility_id' => 'Responsabilità',

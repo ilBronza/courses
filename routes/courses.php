@@ -24,6 +24,49 @@ Route::group(['prefix' => 'courses'], function()
 	Route::delete('{course}/delete', [Courses::getController('course', 'destroy'), 'destroy'])->name('courses.destroy');
 });
 
+Route::group(['prefix' => 'course-themes'], function()
+{
+	Route::get('', [Courses::getController('courseTheme', 'index'), 'index'])->name('courseThemes.index');
+	Route::get('create', [Courses::getController('courseTheme', 'create'), 'create'])->name('courseThemes.create');
+	Route::post('', [Courses::getController('courseTheme', 'store'), 'store'])->name('courseThemes.store');
+
+	Route::get('{courseTheme}', [Courses::getController('courseTheme', 'show'), 'show'])->name('courseThemes.show');
+	Route::get('{courseTheme}/edit', [Courses::getController('courseTheme', 'edit'), 'edit'])->name('courseThemes.edit');
+	Route::put('{courseTheme}', [Courses::getController('courseTheme', 'update'), 'update'])->name('courseThemes.update');
+
+	Route::delete('{courseTheme}/delete', [Courses::getController('courseTheme', 'destroy'), 'destroy'])->name('courseThemes.destroy');
+});
+
+Route::group(['prefix' => 'date-types'], function()
+{
+	Route::get('', [Courses::getController('date', 'index'), 'index'])->name('dates.index');
+	Route::get('create', [Courses::getController('date', 'create'), 'create'])->name('dates.create');
+	Route::post('', [Courses::getController('date', 'store'), 'store'])->name('dates.store');
+	Route::get('{date}', [Courses::getController('date', 'show'), 'show'])->name('dates.show');
+	Route::get('{date}/edit', [Courses::getController('date', 'edit'), 'edit'])->name('dates.edit');
+	Route::put('{date}', [Courses::getController('date', 'update'), 'update'])->name('dates.update');
+	Route::delete('{date}/delete', [Courses::getController('date', 'destroy'), 'destroy'])->name('dates.destroy');
+});
+
+Route::group(['prefix' => 'course-sessions'], function()
+{
+	Route::get('', [Courses::getController('courseSession', 'index'), 'index'])->name('courseSessions.index');
+	Route::get('create', [Courses::getController('courseSession', 'create'), 'create'])->name('courseSessions.create');
+	Route::post('', [Courses::getController('courseSession', 'store'), 'store'])->name('courseSessions.store');
+	Route::get('{courseSession}', [Courses::getController('courseSession', 'show'), 'show'])->name('courseSessions.show');
+	Route::get('{courseSession}/edit', [Courses::getController('courseSession', 'edit'), 'edit'])->name('courseSessions.edit');
+	Route::put('{courseSession}', [Courses::getController('courseSession', 'update'), 'update'])->name('courseSessions.update');
+	Route::delete('{courseSession}/delete', [Courses::getController('courseSession', 'destroy'), 'destroy'])->name('courseSessions.destroy');
+});
+
+Route::group(['prefix' => 'date-sessions'], function()
+{
+	Route::get('', [Courses::getController('dateSession', 'index'), 'index'])->name('dateSessions.index');
+	Route::get('{dateSession}', [Courses::getController('dateSession', 'show'), 'show'])->name('dateSessions.show');
+	Route::get('{dateSession}/edit', [Courses::getController('dateSession', 'edit'), 'edit'])->name('dateSessions.edit');
+	Route::put('{dateSession}', [Courses::getController('dateSession', 'update'), 'update'])->name('dateSessions.update');
+});
+
 Route::group(['prefix' => 'course-needs'], function()
 {
 	Route::get('{alias}', [Courses::getController('courseNeed', 'index'), 'index'])->name('courseNeeds.index');

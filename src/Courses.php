@@ -67,6 +67,15 @@ class Courses implements RoutedObjectInterface
 
 		$coursesManagerButton->addChild(
 			$menu->createButton([
+				'name' => 'courseThemes.index',
+				'icon' => 'layer-group',
+				'text' => 'courses::courses.courseThemes',
+				'href' => $this->route('courseThemes.index'),
+			])
+		);
+
+		$coursesManagerButton->addChild(
+			$menu->createButton([
 				'name' => 'courseNeeds',
 				'icon' => 'list-check',
 				'text' => 'courses::courses.courseNeedsSituation',
@@ -105,6 +114,24 @@ class Courses implements RoutedObjectInterface
 
 
 
+
+		$coursesManagerButton->addChild(
+			$menu->createButton([
+				'name' => 'dates.index',
+				'icon' => 'list-check',
+				'text' => 'courses::courses.dates',
+				'href' => $this->route('dates.index'),
+			])
+		);
+
+		$coursesManagerButton->addChild(
+			$menu->createButton([
+				'name' => 'courseSessions.index',
+				'icon' => 'calendar-days',
+				'text' => 'courses::courses.courseSessions',
+				'href' => $this->route('courseSessions.index'),
+			])
+		);
 
 		$settingsButton->addChild($coursesManagerButton);
 	}

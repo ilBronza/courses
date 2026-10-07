@@ -1,5 +1,27 @@
 <?php
 
+use IlBronza\Courses\Http\Controllers\DateSessions\DateSessionIndexController;
+use IlBronza\Courses\Http\Controllers\DateSessions\DateSessionShowController;
+use IlBronza\Courses\Http\Controllers\DateSessions\DateSessionEditUpdateController;
+use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\DateSessionFieldsGroupParametersFile;
+use IlBronza\Courses\Http\Controllers\Providers\Fieldsets\DateSessionFieldsetsParameters;
+
+use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionIndexController;
+use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionShowController;
+use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionEditUpdateController;
+use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionCreateStoreController;
+use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionDestroyController;
+use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\CourseSessionFieldsGroupParametersFile;
+use IlBronza\Courses\Http\Controllers\Providers\Fieldsets\CourseSessionFieldsetsParameters;
+
+use IlBronza\Courses\Http\Controllers\Dates\DateIndexController;
+use IlBronza\Courses\Http\Controllers\Dates\DateShowController;
+use IlBronza\Courses\Http\Controllers\Dates\DateEditUpdateController;
+use IlBronza\Courses\Http\Controllers\Dates\DateCreateStoreController;
+use IlBronza\Courses\Http\Controllers\Dates\DateDestroyController;
+use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\DateFieldsGroupParametersFile;
+use IlBronza\Courses\Http\Controllers\Providers\Fieldsets\DateFieldsetsParameters;
+
 use IlBronza\Courses\Http\Controllers\ClientOperatorResponsibilities\ClientOperatorResponsibilityIndexController;
 use IlBronza\Courses\Http\Controllers\CourseNeeds\CourseNeedIndexController;
 use IlBronza\Courses\Http\Controllers\Courses\CourseCreateStoreController;
@@ -7,6 +29,16 @@ use IlBronza\Courses\Http\Controllers\Courses\CourseDestroyController;
 use IlBronza\Courses\Http\Controllers\Courses\CourseEditUpdateController;
 use IlBronza\Courses\Http\Controllers\Courses\CourseIndexController;
 use IlBronza\Courses\Http\Controllers\Courses\CourseShowController;
+use IlBronza\Courses\Http\Controllers\CourseThemes\CourseThemeCreateStoreController;
+use IlBronza\Courses\Http\Controllers\CourseThemes\CourseThemeDestroyController;
+use IlBronza\Courses\Http\Controllers\CourseThemes\CourseThemeEditUpdateController;
+use IlBronza\Courses\Http\Controllers\CourseThemes\CourseThemeIndexController;
+use IlBronza\Courses\Http\Controllers\CourseThemes\CourseThemeShowController;
+use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\CourseThemeFieldsGroupParametersFile;
+use IlBronza\Courses\Http\Controllers\Providers\Fieldsets\CourseThemeFieldsetsParameters;
+use IlBronza\Courses\Http\Controllers\Providers\RelationshipsManagers\CourseRelationManager;
+use IlBronza\Courses\Http\Controllers\Providers\RelationshipsManagers\CourseThemeRelationManager;
+use IlBronza\Courses\Http\Controllers\Providers\RelationshipsManagers\CourseSessionRelationManager;
 use IlBronza\Courses\Http\Controllers\OperatorResponsibilities\OperatorResponsibilityIndexController;
 use IlBronza\Courses\Http\Controllers\OperatorResponsibilities\OperatorResponsibilityCreateStoreController;
 use IlBronza\Courses\Http\Controllers\OperatorResponsibilities\OperatorResponsibilityByResponsibilityIndexController;
@@ -41,6 +73,7 @@ use IlBronza\Courses\Models\ClientOperatorResponsibility;
 use IlBronza\Courses\Models\Company;
 use IlBronza\Courses\Models\CompanyWorker;
 use IlBronza\Courses\Models\Course;
+use IlBronza\Courses\Models\CourseTheme;
 use IlBronza\Courses\Models\CourseNeed;
 use IlBronza\Courses\Models\CourseSession;
 use IlBronza\Courses\Models\CourseSessionDateSession;
@@ -76,6 +109,9 @@ return [
 		'course' => [
 			'table' => 'courses__courses',
 			'class' => Course::class,
+			'relationshipsManagerClasses' => [
+				'show' => CourseRelationManager::class,
+			],
 			'fieldsGroupsFiles' => [
 				'index' => CourseFieldsGroupParametersFile::class,
 			],
@@ -98,6 +134,28 @@ return [
 				'needs' => [
 					// 'FL_G' => \App\Helpers\Courses\Needs\FlgCourseNeedsHelper::class,
 				],
+			],
+		],
+		'courseTheme' => [
+			'relationshipsManagerClasses' => ['show' => CourseThemeRelationManager::class],
+			'table' => 'courses__course_themes',
+			'class' => CourseTheme::class,
+			'fieldsGroupsFiles' => [
+				'index' => CourseThemeFieldsGroupParametersFile::class,
+			],
+			'parametersFiles' => [
+				'create' => CourseThemeFieldsetsParameters::class,
+				'edit' => CourseThemeFieldsetsParameters::class,
+				'show' => CourseThemeFieldsetsParameters::class,
+			],
+			'controllers' => [
+				'index' => CourseThemeIndexController::class,
+				'create' => CourseThemeCreateStoreController::class,
+				'store' => CourseThemeCreateStoreController::class,
+				'show' => CourseThemeShowController::class,
+				'edit' => CourseThemeEditUpdateController::class,
+				'update' => CourseThemeEditUpdateController::class,
+				'destroy' => CourseThemeDestroyController::class,
 			],
 		],
 		'courseNeed' => [
@@ -150,14 +208,57 @@ return [
 		'date' => [
 			'table' => 'courses__dates',
 			'class' => Date::class,
+			'fieldsGroupsFiles' => ['index' => DateFieldsGroupParametersFile::class],
+			'parametersFiles' => [
+				'create' => DateFieldsetsParameters::class,
+				'edit' => DateFieldsetsParameters::class,
+				'show' => DateFieldsetsParameters::class,
+			],
+			'controllers' => [
+				'index' => DateIndexController::class,
+				'show' => DateShowController::class,
+				'edit' => DateEditUpdateController::class,
+				'update' => DateEditUpdateController::class,
+				'create' => DateCreateStoreController::class,
+				'store' => DateCreateStoreController::class,
+				'destroy' => DateDestroyController::class,
+			],
 		],
 		'courseSession' => [
+			'relationshipsManagerClasses' => ['show' => CourseSessionRelationManager::class],
 			'table' => 'courses__course_sessions',
 			'class' => CourseSession::class,
+			'fieldsGroupsFiles' => ['index' => CourseSessionFieldsGroupParametersFile::class],
+			'parametersFiles' => [
+				'create' => CourseSessionFieldsetsParameters::class,
+				'edit' => CourseSessionFieldsetsParameters::class,
+				'show' => CourseSessionFieldsetsParameters::class,
+			],
+			'controllers' => [
+				'index' => CourseSessionIndexController::class,
+				'show' => CourseSessionShowController::class,
+				'edit' => CourseSessionEditUpdateController::class,
+				'update' => CourseSessionEditUpdateController::class,
+				'create' => CourseSessionCreateStoreController::class,
+				'store' => CourseSessionCreateStoreController::class,
+				'destroy' => CourseSessionDestroyController::class,
+			],
 		],
 		'dateSession' => [
 			'table' => 'courses__date_sessions',
 			'class' => DateSession::class,
+			'fieldsGroupsFiles' => ['index' => DateSessionFieldsGroupParametersFile::class],
+			'parametersFiles' => [
+				'create' => DateSessionFieldsetsParameters::class,
+				'edit' => DateSessionFieldsetsParameters::class,
+				'show' => DateSessionFieldsetsParameters::class,
+			],
+			'controllers' => [
+				'index' => DateSessionIndexController::class,
+				'show' => DateSessionShowController::class,
+				'edit' => DateSessionEditUpdateController::class,
+				'update' => DateSessionEditUpdateController::class,
+			],
 		],
 		'companyWorker' => [
 			'table' => 'courses__company_workers',

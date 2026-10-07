@@ -10,6 +10,11 @@ class CourseShowController extends CourseCRUD
 
 	public $allowedMethods = ['show'];
 
+	public function getRelationshipsManagerClass()
+	{
+		return config('courses.models.course.relationshipsManagerClasses.show');
+	}
+
 	public function getGenericParametersFile() : ? string
 	{
 		return config('courses.models.course.parametersFiles.show');

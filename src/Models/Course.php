@@ -31,6 +31,22 @@ class Course extends CoursesPackageBaseModel
 	];
 
 	static $modelConfigPrefix = 'course';
+	static $deletingRelationships = ['themes', 'dates', 'courseSessions'];
+
+	public function dates()
+	{
+		return $this->hasMany(Date::gpc())->orderBy('sorting_index')->orderBy('name');
+	}
+
+	public function courseSessions()
+	{
+		return $this->hasMany(CourseSession::gpc());
+	}
+
+	public function themes()
+	{
+		return $this->hasMany(CourseTheme::gpc());
+	}
 
 	public function scopeByAlias(Builder $query, string $alias): Builder
 	{
