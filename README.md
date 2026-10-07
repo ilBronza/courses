@@ -18,12 +18,129 @@ Il package non è solo il motore di validità. Fornisce il dominio e le migrazio
 | Area | Entità principali | Scopo |
 | --- | --- | --- |
 | Catalogo | `Course`, `Responsibility` | Definire corsi e tipologie di responsabilità. |
-| Erogazione | `CourseSession`, `Date`, `DateSession` | Pianificare un corso, le sue date e le sessioni effettive. |
+| Progettazione | `Date`, `CourseTheme::program` | Definire le tipologie di data e le ore obbligatorie; suddividerle in lezioni per ciascuna tematica. |
+| Erogazione | `CourseSession`, `DateSession` | Creare le edizioni dalle tematiche e calendarizzare le lezioni generate. |
 | Partecipazione | `WorkerCourseSession`, `Attendance` | Collegare lavoratori alle sessioni e registrarne la presenza. |
 | Storico lavoratore | `CourseWorker`, `CompanyWorker` | Rappresentare corsi e rapporti del lavoratore, compreso l’accesso ai dati legacy nell’integrazione Ecostudio. |
 | Responsabilità | `OperatorResponsibility`, `ClientOperatorResponsibility` | Assegnare responsabilità agli operatori e calcolarne il relativo stato di validità. |
 
 Le migrazioni del package creano le tabelle con prefisso `courses__`. Le regole di business sulla validità, invece, sono specifiche del progetto Ecostudio e vivono nell’applicazione ospitante.
+
+## Tematiche dei corsi
+
+`CourseTheme` rappresenta una tematica specifica di un corso, per esempio
+Farmacia o Parafarmacia. Ogni tematica appartiene a un `Course` tramite
+`course_id`; responsabilità e validità rimangono definite sul corso.
+Le relazioni sono `Course::themes()` e `CourseTheme::course()`.
+
+La tabella `courses__course_themes` contiene UUID, corso, nome, descrizione
+facoltativa, JSON `ateco`, timestamp e cancellazione logica. Il JSON usa il
+formato dell'editor a righe del package Form:
+
+```json
+[
+  {"code": "01.11.00"},
+  {"code": "02.10.00"}
+]
+```
+
+I codici sono stringhe: punti e zeri iniziali vengono conservati. L'elenco è
+facoltativo; le righe vuote vengono scartate e i duplicati rifiutati dal form.
+Il campo è predisposto per la futura selezione delle aziende destinatarie;
+non esegue ancora abbinamenti o verifiche sul catalogo ATECO.
+
+La voce **Tematiche dei corsi** nel menu espone elenco, creazione, dettaglio,
+modifica ed eliminazione. Il dettaglio di ogni corso mostra le sue tematiche
+e il pulsante **Nuova tematica**, che preseleziona il corso. La cancellazione
+del corso tramite il CRUD cancella logicamente anche le sue tematiche.
+
+Per attivare la tabella nell'applicazione ospitante, eseguire `php artisan migrate`.
+Le edizioni si riferiscono alla tematica tramite `course_theme_id`.
+
+## Tipologie di data, programmi ed edizioni
+
+Il percorso di progettazione è:
+
+```text
+Corso FL_G
+  ├─ Tipologia Teoria: 8 ore obbligatorie
+  ├─ Tipologia Pratica: 4 ore obbligatorie
+  └─ Tematica Farmacia
+       ├─ Programma: Teoria 1 (4h), Teoria 2 (4h), Esercitazione (4h)
+       └─ Edizione di ottobre
+            └─ Tre lezioni indipendenti, ciascuna con giorno e ora da assegnare
+```
+
+### Tipologie del corso
+
+`Date` è il modello delle **tipologie di data**, per esempio Teoria e Pratica.
+Appartiene a un corso (`Course::dates()`) e definisce nome, descrizione,
+ore obbligatorie e ordine. Il menu **Tipologie di data** espone il CRUD;
+dal dettaglio del corso, **Nuova tipologia di data** preseleziona il corso.
+
+Le ore ammettono due decimali e devono essere maggiori di zero. I vincoli di
+progettazione usano le ore di ciascuna tipologia; il campo storico `Course::hours`
+non viene usato per sostituire questi vincoli né aggiornato automaticamente.
+
+### Programma della tematica
+
+Il campo JSON `CourseTheme::program` contiene le lezioni in ordine:
+
+```json
+[
+  {"date_id": "uuid-tipologia-teoria", "name": "Teoria 1", "hours": "4.00", "description": "Introduzione"},
+  {"date_id": "uuid-tipologia-teoria", "name": "Teoria 2", "hours": "4.00"},
+  {"date_id": "uuid-tipologia-pratica", "name": "Esercitazione", "hours": "4.00"}
+]
+```
+
+Il form di creazione da un corso e quello di modifica di una tematica senza
+programma propongono una lezione per tipologia, con le ore previste dal corso.
+La traccia è modificabile prima del salvataggio: si possono suddividere le ore
+in più lezioni e specificarne i contenuti. È possibile lasciare il programma
+vuoto, conservando la tematica nello stato **Da progettare**.
+
+Un programma non vuoto deve rispettare **esattamente le ore di ogni tipologia**.
+Con 8 ore di teoria e 4 di pratica, 9+3 non è valido. Non sono accettate tipologie
+di altri corsi, eliminate, ore negative o più di due decimali. Il confronto
+avviene sommando centesimi di ora interi. I controlli sono applicati anche dal
+modello, quindi valgono fuori dai form HTTP.
+
+Una tipologia già usata in un programma non può essere eliminata; aggiungere
+tipologie o modificarne le ore non può invalidare i programmi salvati. Per
+riprogettare le regole del corso occorre prima svuotare i programmi interessati.
+Una tematica che ha già edizioni non può essere spostata su un altro corso.
+
+### Edizioni e date reali
+
+`CourseSession` rappresenta un'edizione: tematica, corso derivato dalla tematica,
+nome e periodo desiderato facoltativo. Si crea dal menu **Edizioni**, dal corso
+o dalla tematica. La tematica deve avere un programma completo.
+
+Alla creazione, in un'unica transazione, il programma viene copiato in record
+`DateSession` (`CourseSession::dateSessions()`). Ogni lezione conserva tipologia,
+nome della tipologia, titolo, descrizione, ore e posizione. `starts_at` è inizialmente
+nullo; il dettaglio dell'edizione permette di aprire e calendarizzare ogni lezione.
+Il form della lezione modifica titolo, descrizione e giorno/ora; ore e tipologia
+restano quelle copiate. Le lezioni vengono generate una sola volta e non hanno
+creazione o eliminazione autonoma tramite il CRUD.
+
+Le modifiche al programma valgono per le edizioni successive. Le edizioni già
+create conservano le proprie lezioni, anche se il programma viene svuotato o la
+tematica viene eliminata. Corso e tematica di un'edizione non sono riassegnabili.
+Eliminare un'edizione tramite il CRUD cancella logicamente le sue lezioni;
+eliminare il corso tramite il CRUD cancella anche tematiche, tipologie ed edizioni.
+
+La migrazione `2026_10_03_000022_create_course_planning_tables.php` attiva le tabelle
+`courses__dates`, `courses__course_sessions`, `courses__date_sessions` e il programma
+della tematica. Le precedenti bozze in `database/` (fuori da `database/migrations/`)
+non sono caricate dal service provider e non vanno eseguite insieme a questa
+migrazione. Ogni lezione reale appartiene a una sola edizione; il vecchio abbozzo
+del collegamento molti-a-molti non viene utilizzato.
+
+La suite `CoursePlanningTest` verifica i vincoli per tipologia, le ore frazionarie,
+la generazione atomica, l'indipendenza delle edizioni, la calendarizzazione e le
+schermate CRUD. La suite `CourseThemeTest` copre anche ATECO e relazioni delle tematiche.
 
 ## Dove vive il codice
 
