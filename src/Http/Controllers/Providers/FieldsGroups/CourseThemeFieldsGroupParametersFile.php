@@ -14,6 +14,7 @@ class CourseThemeFieldsGroupParametersFile extends FieldsGroupParametersFile
 				'mySelfPrimary' => 'primary',
 				'mySelfEdit' => 'links.edit',
 				'mySelfSee' => 'links.see',
+				'course.alias' => 'flat',
 				'course.name' => 'flat',
 				'name' => 'flat',
 				'description' => 'flat',
