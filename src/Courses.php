@@ -133,6 +133,15 @@ class Courses implements RoutedObjectInterface
 			])
 		);
 
+		$coursesManagerButton->addChild(
+			$menu->createButton([
+				'name' => 'teachers.index',
+				'icon' => 'chalkboard-user',
+				'text' => 'courses::courses.teachers',
+				'href' => $this->route('teachers.index'),
+			])
+		);
+
 		$settingsButton->addChild($coursesManagerButton);
 	}
 }

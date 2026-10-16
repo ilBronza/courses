@@ -1,6 +1,10 @@
 <?php
 
 return [
+	'teachers' => 'Docenti',
+	'teacher_names' => 'Docenti',
+	'email' => 'Email',
+	'phone' => 'Telefono',
 	'programParameters' => 'Programma della tematica',
 	'program' => 'Lezioni — il totale di ogni tipologia deve coincidere con quello del corso',
 	'program_requirements' => 'Ore obbligatorie per tipologia',

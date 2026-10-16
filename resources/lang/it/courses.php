@@ -14,6 +14,8 @@ return [
 	'createCourseSession' => 'Nuova edizione',
 	'courseSessions' => 'Edizioni',
 	'courseSession' => 'Edizione',
+	'teachers' => 'Docenti',
+	'teacher' => 'Docente',
 	'dates' => 'Tipologie di data',
 	'date' => 'Tipologia di data',
 	'dateSessions' => 'Date delle edizioni',

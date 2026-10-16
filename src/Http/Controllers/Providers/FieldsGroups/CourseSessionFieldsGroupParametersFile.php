@@ -17,6 +17,7 @@ class CourseSessionFieldsGroupParametersFile extends FieldsGroupParametersFile
 				'course.name' => 'flat',
 				'courseTheme.name' => 'flat',
 				'name' => 'flat',
+				'teacher_names' => 'flat',
 				'desired_start_date' => 'dates.date',
 				'desired_end_date' => 'dates.date',
 				'mySelfDelete' => 'links.delete',

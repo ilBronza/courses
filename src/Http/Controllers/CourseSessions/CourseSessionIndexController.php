@@ -23,6 +23,6 @@ class CourseSessionIndexController extends CourseSessionCRUD
 
 	public function getIndexElements()
 	{
-		return $this->getModelClass()::with('courseTheme')->orderBy('name')->get();
+		return $this->getModelClass()::with(['course', 'courseTheme', 'teachers'])->orderBy('name')->get();
 	}
 }

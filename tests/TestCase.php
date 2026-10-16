@@ -101,6 +101,7 @@ abstract class TestCase extends BaseTestCase
 			'2026_08_31_000019_add_archived_at_to_courses__courses_table.php',
 			'2026_10_01_000021_create_courses__course_themes_table.php',
 			'2026_10_03_000022_create_course_planning_tables.php',
+			'2026_10_15_000023_create_teachers_and_course_session_teacher_tables.php',
 		] as $filename)
 			(require __DIR__ . '/../database/migrations/' . $filename)->up();
 

@@ -17,6 +17,9 @@ class CourseSessionEditUpdateController extends CourseSessionCRUD
 
 	public function update(Request $request, $courseSession)
 	{
-		return $this->_update($request, $this->findModel($courseSession));
+		$edition = $this->findModel($courseSession);
+		$this->prepareTeachers($request);
+
+		return $edition->getConnection()->transaction(fn () => $this->_update($request, $edition));
 	}
 }

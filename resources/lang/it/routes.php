@@ -2,6 +2,15 @@
 
 return [
 	'ibCourses' => [
+		'teachers' => [
+			'index' => 'Docenti',
+			'create' => 'Nuovo docente',
+			'store' => 'Salva docente',
+			'show' => 'Dettaglio docente',
+			'edit' => 'Modifica docente',
+			'update' => 'Aggiorna docente',
+			'destroy' => 'Elimina docente',
+		],
 		'courses' => [
 			'index' => 'Corsi',
 			'create' => 'Nuovo corso',

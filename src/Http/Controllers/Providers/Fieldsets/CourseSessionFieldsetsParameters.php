@@ -3,6 +3,7 @@
 namespace IlBronza\Courses\Http\Controllers\Providers\Fieldsets;
 
 use IlBronza\Courses\Models\CourseTheme;
+use IlBronza\Courses\Models\Teacher;
 use IlBronza\Form\Helpers\FieldsetsProvider\FieldsetParametersFile;
 
 class CourseSessionFieldsetsParameters extends FieldsetParametersFile
@@ -19,6 +20,10 @@ class CourseSessionFieldsetsParameters extends FieldsetParametersFile
 		])->all();
 		if($model?->exists && $theme = $model->courseTheme)
 			$choices[$theme->getKey()] = $theme->name;
+		$teachers = Teacher::gpc()::orderBy('name')->get()->mapWithKeys(fn ($teacher) => [$teacher->getKey() => $teacher->name])->all();
+		if($model?->exists)
+			foreach($model->teachers as $teacher)
+				$teachers[$teacher->getKey()] = $teacher->name . ($teacher->trashed() ? ' (eliminato)' : '');
 
 		return [
 			'baseParameters' => [
@@ -32,6 +37,11 @@ class CourseSessionFieldsetsParameters extends FieldsetParametersFile
 						'rules' => 'required|string|exists:' . config('courses.models.courseTheme.table') . ',id,deleted_at,NULL',
 					],
 					'name' => ['text' => 'required|string|max:255'],
+					'teachers' => [
+						'type' => 'select', 'select2' => false, 'multiple' => true, 'relation' => 'teachers',
+						'possibleValuesArray' => $teachers,
+						'rules' => 'nullable|array',
+					],
 					'desired_start_date' => ['date' => 'nullable|date'],
 					'desired_end_date' => ['date' => 'nullable|date'],
 				],

@@ -48,6 +48,17 @@ Route::group(['prefix' => 'date-types'], function()
 	Route::delete('{date}/delete', [Courses::getController('date', 'destroy'), 'destroy'])->name('dates.destroy');
 });
 
+Route::group(['prefix' => 'teachers'], function()
+{
+	Route::get('', [Courses::getController('teacher', 'index'), 'index'])->name('teachers.index');
+	Route::get('create', [Courses::getController('teacher', 'create'), 'create'])->name('teachers.create');
+	Route::post('', [Courses::getController('teacher', 'store'), 'store'])->name('teachers.store');
+	Route::get('{teacher}', [Courses::getController('teacher', 'show'), 'show'])->name('teachers.show');
+	Route::get('{teacher}/edit', [Courses::getController('teacher', 'edit'), 'edit'])->name('teachers.edit');
+	Route::put('{teacher}', [Courses::getController('teacher', 'update'), 'update'])->name('teachers.update');
+	Route::delete('{teacher}/delete', [Courses::getController('teacher', 'destroy'), 'destroy'])->name('teachers.destroy');
+});
+
 Route::group(['prefix' => 'course-sessions'], function()
 {
 	Route::get('', [Courses::getController('courseSession', 'index'), 'index'])->name('courseSessions.index');

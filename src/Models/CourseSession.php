@@ -5,6 +5,7 @@ namespace IlBronza\Courses\Models;
 use IlBronza\Courses\Helpers\CourseProgram;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class CourseSession extends CoursesPackageBaseModel
@@ -82,6 +83,35 @@ class CourseSession extends CoursesPackageBaseModel
 	public function dateSessions()
 	{
 		return $this->hasMany(DateSession::gpc())->orderBy('sorting_index');
+	}
+
+	public function teachers()
+	{
+		return $this->belongsToMany(Teacher::gpc(), config('courses.models.courseSessionTeacher.table'), 'course_session_id', 'teacher_id')
+			->withTrashed()->orderBy('name');
+	}
+
+	public function relateTeachers(?array $teacherIds) : void
+	{
+		$teacherIds ??= [];
+		// Allow keeping historical assignments, but only active teachers can be added.
+		$assignedIds = $this->teachers()->allRelatedIds()->all();
+		Validator::make(['teachers' => $teacherIds], [
+			'teachers' => 'array',
+			'teachers.*' => [
+				'required', 'uuid', 'distinct',
+				Rule::exists(config('courses.models.teacher.table'), 'id')->where(
+					fn ($query) => $query->where(fn ($query) => $query->whereNull('deleted_at')->orWhereIn('id', $assignedIds))
+				),
+			],
+		])->validate();
+		$this->teachers()->sync($teacherIds);
+		$this->unsetRelation('teachers');
+	}
+
+	public function getTeacherNamesAttribute() : string
+	{
+		return $this->teachers->pluck('name')->implode(', ');
 	}
 
 	public function getCreateByRelatedUrl(Model $related) : string

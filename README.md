@@ -20,6 +20,7 @@ Il package non è solo il motore di validità. Fornisce il dominio e le migrazio
 | Catalogo | `Course`, `Responsibility` | Definire corsi e tipologie di responsabilità. |
 | Progettazione | `Date`, `CourseTheme::program` | Definire le tipologie di data e le ore obbligatorie; suddividerle in lezioni per ciascuna tematica. |
 | Erogazione | `CourseSession`, `DateSession` | Creare le edizioni dalle tematiche e calendarizzare le lezioni generate. |
+| Docenti | `Teacher`, `CourseSession::teachers()` | Gestire l’anagrafica e assegnare uno o più docenti a ciascuna edizione. |
 | Partecipazione | `WorkerCourseSession`, `Attendance` | Collegare lavoratori alle sessioni e registrarne la presenza. |
 | Storico lavoratore | `CourseWorker`, `CompanyWorker` | Rappresentare corsi e rapporti del lavoratore, compreso l’accesso ai dati legacy nell’integrazione Ecostudio. |
 | Responsabilità | `OperatorResponsibility`, `ClientOperatorResponsibility` | Assegnare responsabilità agli operatori e calcolarne il relativo stato di validità. |
@@ -141,6 +142,30 @@ del collegamento molti-a-molti non viene utilizzato.
 La suite `CoursePlanningTest` verifica i vincoli per tipologia, le ore frazionarie,
 la generazione atomica, l'indipendenza delle edizioni, la calendarizzazione e le
 schermate CRUD. La suite `CourseThemeTest` copre anche ATECO e relazioni delle tematiche.
+
+## Docenti delle edizioni
+
+La voce **Docenti** in Gestione corsi espone elenco, creazione, dettaglio,
+modifica ed eliminazione dell’anagrafica. Ogni docente ha un nome obbligatorio
+(nome e cognome), email, telefono e note facoltativi. Il dettaglio mostra le
+edizioni associate.
+
+Nei form di creazione e modifica di un’edizione, **Docenti** permette di
+selezionare più persone dall’archivio. L’assegnazione è facoltativa e specifica
+dell’edizione: lo stesso docente può tenere più edizioni e due edizioni dello
+stesso corso possono avere docenti diversi. Deselezionando tutti i docenti si
+svuota l’assegnazione. L’elenco delle edizioni mostra i nomi dei docenti;
+il dettaglio permette di aprire le rispettive schede.
+
+Le relazioni `CourseSession::teachers()` e `Teacher::courseSessions()` usano
+la tabella ponte `courses__course_session_teacher`, con coppie univoche.
+L’eliminazione logica di un docente lo rimuove dall’archivio selezionabile per
+nuove assegnazioni e conserva quelle storiche. Un docente eliminato già
+associato può essere mantenuto o rimosso dal form dell’edizione.
+Eliminare un’edizione non elimina i docenti.
+
+Eseguire `php artisan migrate` nell’applicazione ospitante per applicare
+`2026_10_15_000023_create_teachers_and_course_session_teacher_tables.php`.
 
 ## Dove vive il codice
 

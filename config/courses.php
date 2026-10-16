@@ -1,5 +1,15 @@
 <?php
 
+use IlBronza\Courses\Http\Controllers\Teachers\TeacherCreateStoreController;
+use IlBronza\Courses\Http\Controllers\Teachers\TeacherDestroyController;
+use IlBronza\Courses\Http\Controllers\Teachers\TeacherEditUpdateController;
+use IlBronza\Courses\Http\Controllers\Teachers\TeacherIndexController;
+use IlBronza\Courses\Http\Controllers\Teachers\TeacherShowController;
+use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\TeacherFieldsGroupParametersFile;
+use IlBronza\Courses\Http\Controllers\Providers\Fieldsets\TeacherFieldsetsParameters;
+use IlBronza\Courses\Http\Controllers\Providers\RelationshipsManagers\TeacherRelationManager;
+use IlBronza\Courses\Models\Teacher;
+
 use IlBronza\Courses\Http\Controllers\DateSessions\DateSessionIndexController;
 use IlBronza\Courses\Http\Controllers\DateSessions\DateSessionShowController;
 use IlBronza\Courses\Http\Controllers\DateSessions\DateSessionEditUpdateController;
@@ -106,6 +116,29 @@ return [
 	'enabled' => true,
 
 	'models' => [
+		'teacher' => [
+			'table' => 'courses__teachers',
+			'class' => Teacher::class,
+			'relationshipsManagerClasses' => ['show' => TeacherRelationManager::class],
+			'fieldsGroupsFiles' => ['index' => TeacherFieldsGroupParametersFile::class],
+			'parametersFiles' => [
+				'create' => TeacherFieldsetsParameters::class,
+				'edit' => TeacherFieldsetsParameters::class,
+				'show' => TeacherFieldsetsParameters::class,
+			],
+			'controllers' => [
+				'index' => TeacherIndexController::class,
+				'create' => TeacherCreateStoreController::class,
+				'store' => TeacherCreateStoreController::class,
+				'show' => TeacherShowController::class,
+				'edit' => TeacherEditUpdateController::class,
+				'update' => TeacherEditUpdateController::class,
+				'destroy' => TeacherDestroyController::class,
+			],
+		],
+		'courseSessionTeacher' => [
+			'table' => 'courses__course_session_teacher',
+		],
 		'course' => [
 			'table' => 'courses__courses',
 			'class' => Course::class,
