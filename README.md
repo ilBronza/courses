@@ -223,6 +223,39 @@ Il tipo è la responsabilità del corso dell’edizione (`Course::common_alias`)
 Gli elenchi mostrano operatore, corso, responsabilità, edizione, stato,
 completamento, esito, note e data di inserimento, dalle più recenti.
 
+Le checkbox permettono di selezionare le partecipazioni. I due pulsanti POST
+**Scarica PDF** e **Invia attestati** operano solo sulle righe selezionate.
+
+Le richieste vengono inviate via AJAX, senza cambiare pagina. Gli errori
+indicano l’operatore, l’edizione e il campo da completare; per esempio una data
+di completamento mancante. Se non ci sono righe selezionate, il messaggio
+invita a selezionare almeno una partecipazione. PDF e ZIP vengono scaricati
+solo dopo una risposta riuscita; anche l’esito dell’invio email resta visibile
+nella pagina della tabella.
+
+- **Scarica PDF** restituisce direttamente il PDF per una partecipazione,
+  oppure uno ZIP con tutti i PDF per una selezione multipla. Il file ZIP
+  temporaneo viene eliminato dopo lo scaricamento.
+- **Invia attestati** invia subito tramite il mailer Laravel all’indirizzo
+  principale restituito da `Operator::getEmail()`. Ogni operatore riceve una
+  sola email con tutti i suoi attestati selezionati; non si possono passare
+  destinatari alternativi nella richiesta.
+
+Entrambe le azioni verificano selezione e permessi. Prima di inviare email
+vengono controllati tutti i destinatari e generati tutti i PDF: un indirizzo
+mancante/non valido o dati incompleti impediscono l’intero invio. Se il mailer
+fallisce per un operatore, gli altri invii proseguono e la pagina mostra gli
+invii riusciti e quelli non riusciti.
+
+Per `OperatorCourseSession`, l’helper PDF usa il catalogo attuale: operatore,
+corso, ore copiate nelle lezioni dell’edizione, date effettivamente pianificate,
+`completed_at` e docenti dell’edizione. La data di completamento è obbligatoria
+per l’attestato; il periodo desiderato dell’edizione e le note private non
+vengono usati come dati di frequenza. Il nome del PDF include l’UUID della
+partecipazione. Restano disponibili template, configurazioni e helper per
+alias descritti nella sezione attestati. Lo ZIP richiede l’estensione PHP
+`ext-zip`; l’invio usa la configurazione `mail` dell’applicazione ospitante.
+
 La coppia operatore/edizione è univoca anche dopo una cancellazione logica:
 per riattivare una partecipazione eliminata si usa `restore()`. Le nuove
 partecipazioni richiedono un operatore e un’edizione attivi. Quelle esistenti

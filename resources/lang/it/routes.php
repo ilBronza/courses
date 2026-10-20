@@ -60,6 +60,8 @@ return [
 			'index' => 'Tutte le partecipazioni alle edizioni',
 			'recent' => 'Partecipazioni alle edizioni recenti',
 			'byResponsibility' => 'Partecipazioni alle edizioni per responsabilità',
+			'downloadCertificates' => 'Scarica attestati PDF',
+			'sendCertificates' => 'Invia attestati',
 		],
 		'courseNeeds' => [
 			'index' => 'Fabbisogni corso',

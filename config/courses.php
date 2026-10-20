@@ -24,6 +24,7 @@ use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionDestroyControl
 use IlBronza\Courses\Http\Controllers\OperatorCourseSessions\OperatorCourseSessionIndexController;
 use IlBronza\Courses\Http\Controllers\OperatorCourseSessions\OperatorCourseSessionRecentIndexController;
 use IlBronza\Courses\Http\Controllers\OperatorCourseSessions\OperatorCourseSessionByResponsibilityIndexController;
+use IlBronza\Courses\Http\Controllers\OperatorCourseSessions\OperatorCourseSessionCertificateController;
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\OperatorCourseSessionFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\CourseSessionFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\Fieldsets\CourseSessionFieldsetsParameters;
@@ -338,6 +339,8 @@ return [
 				'index' => OperatorCourseSessionIndexController::class,
 				'recent' => OperatorCourseSessionRecentIndexController::class,
 				'byResponsibility' => OperatorCourseSessionByResponsibilityIndexController::class,
+				'downloadCertificates' => OperatorCourseSessionCertificateController::class,
+				'sendCertificates' => OperatorCourseSessionCertificateController::class,
 			],
 		],
 		'attendance' => [

@@ -83,6 +83,8 @@ Route::group(['prefix' => 'operator-course-sessions'], function()
 	Route::get('', [Courses::getController('operatorCourseSession', 'index'), 'index'])->name('operatorCourseSessions.index');
 	Route::get('recent', [Courses::getController('operatorCourseSession', 'recent'), 'index'])->name('operatorCourseSessions.recent');
 	Route::get('by-responsibility/{responsibility}', [Courses::getController('operatorCourseSession', 'byResponsibility'), 'index'])->name('operatorCourseSessions.byResponsibility');
+	Route::post('certificates/download', [Courses::getController('operatorCourseSession', 'downloadCertificates'), 'downloadCertificates'])->name('operatorCourseSessions.downloadCertificates');
+	Route::post('certificates/send', [Courses::getController('operatorCourseSession', 'sendCertificates'), 'sendCertificates'])->name('operatorCourseSessions.sendCertificates');
 });
 
 Route::group(['prefix' => 'course-needs'], function()
