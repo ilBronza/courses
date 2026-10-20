@@ -99,6 +99,7 @@ use IlBronza\Courses\Models\OperatorResponsibility;
 use IlBronza\Courses\Models\Responsibility;
 use IlBronza\Courses\Models\Worker;
 use IlBronza\Courses\Helpers\OperatorResponsibilities\OperatorResponsibilityValidityHelper;
+use IlBronza\Courses\Helpers\Certificates\CourseCertificatePdfHelper;
 
 return [
 	'routePrefix' => 'ibCourses.',
@@ -112,12 +113,30 @@ return [
 	],
 
 	'helpers' => [
+		'certificates' => CourseCertificatePdfHelper::class,
 		'operatorResponsibilities' => [
 			'validity' => OperatorResponsibilityValidityHelper::class,
 		],
 	],
 
 	'enabled' => true,
+
+	'certificates' => [
+		'legacy_connection' => 'old',
+		// null uses storage_path('app/temp/course-certificates').
+		'temp_directory' => null,
+		'view' => 'courses::certificates.default',
+		'defaults' => [
+			'header' => ['title' => 'ATTESTATO DI FREQUENZA', 'subtitle' => null, 'organizations' => []],
+			'participant' => ['tax_code' => null, 'company' => null, 'role' => null, 'ateco' => null],
+			'course' => ['classification' => null, 'delivery_mode' => null, 'starts_on' => null, 'dates' => [], 'location' => null],
+			'disclaimer' => ['paragraphs' => [], 'assessment' => null, 'notes' => [], 'place' => null, 'issued_on' => null],
+			// null keeps the signatories extracted from the participation.
+			'signatures' => null,
+		],
+		// Optional data overrides by course alias, without introducing subclasses.
+		'courses' => [],
+	],
 
 	'models' => [
 		'teacher' => [
@@ -167,6 +186,8 @@ return [
 				'destroy' => CourseDestroyController::class,
 			],
 			'helpers' => [
+				// Optional subclasses of CourseCertificatePdfHelper, keyed by course alias.
+				'certificates' => [],
 				//classi che estendono CourseNeedsHelperGeneral, dichiarate dall'applicazione
 				'needs' => [
 					// 'FL_G' => \App\Helpers\Courses\Needs\FlgCourseNeedsHelper::class,

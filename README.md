@@ -2,6 +2,158 @@
 
 Pacchetto Laravel per gestire corsi, sessioni, presenze e responsabilità formative degli operatori.
 
+## Attestati PDF
+
+`CourseCertificatePdfHelper` è un helper concreto: genera un attestato A4
+orizzontale con header, discente, corso, dichiarazioni e firme. Non richiede
+controller, route o modifiche ai modelli dell'applicazione. Il rendering usa
+[Dompdf](https://github.com/dompdf/dompdf), dichiarato nelle dipendenze Composer.
+
+### Utilizzo attuale con Ecostudio
+
+Accetta sia un oggetto restituito dal query builder sia il pivot Eloquent
+`App\Models\Clientity\CourseWorker`:
+
+```php
+use IlBronza\Courses\Helpers\Certificates\CourseCertificatePdfHelper;
+use Illuminate\Support\Facades\DB;
+
+$participation = DB::connection('old')->table('course_workers')
+    ->where('id', $courseWorkerId)->firstOrFail();
+
+$helperClass = config('courses.helpers.certificates', CourseCertificatePdfHelper::class);
+$helper = new $helperClass($participation);
+
+$path = $helper->save();        // Genera e salva il PDF, restituisce il percorso.
+$path = $helper->getFilePath(); // Restituisce il percorso senza generare file.
+$pdf = $helper->generate();     // Restituisce i byte PDF, senza salvarli.
+$html = $helper->renderHtml();  // Anteprima HTML.
+// return $helper->download();  // Salva e restituisce la risposta di download.
+```
+
+L'adapter `LegacyCourseWorkerCertificateData` usa il trait
+`ExtractsLegacyCourseWorkerCertificateData`. Legge esplicitamente dalla
+connessione `courses.certificates.legacy_connection`, inizialmente `old`:
+
+- `courses`, tramite `course_workers.course_id`: alias, nome e ore;
+- `workers`, tramite `worker_id`: cognome, nome, codice fiscale e ATECO;
+- `companies`, esclusivamente tramite il `company_id` della partecipazione;
+- `company_worker`: mansione dell'associazione attiva più recente per quella
+  coppia azienda/lavoratore;
+- la riga ricevuta: completamento, date teoria/pratica, sede, modalità
+  e-learning e nominativi dei docenti in `teacher_string`.
+
+Le relazioni Eloquent non vengono usate: nell'applicazione Ecostudio `course()`
+punta al catalogo nuovo, mentre qui servono i dati legacy. I record correlati
+sono mantenuti in memoria per la durata dell'helper. `subscription_date` non
+viene interpretata come data di frequenza iniziale; l'intervallo può essere
+fornito esplicitamente. L'helper non modifica il database né ricalcola la
+validità della partecipazione. Completamento, nominativo, titolo e durata
+devono essere presenti per generare il PDF.
+
+La cartella predefinita è `storage/app/temp/course-certificates`, modificabile
+con `courses.certificates.temp_directory` (percorso assoluto). Il nome deriva da
+`hidden_notes`, conservando maiuscole, spazi e underscore e aggiungendo `.pdf`
+solo quando manca. L'importatore legacy conserva le note precedenti e aggiunge
+il codice su una nuova riga: viene usata l'ultima riga non vuota. Un valore
+vuoto, troppo lungo o contenente percorsi produce un errore esplicito.
+`save()` rigenera e sostituisce il file allo stesso percorso; non aggiorna
+`hidden_notes` e non marca l'attestato come inviato.
+
+### Dati grafici, dichiarazioni e firme
+
+Gli enti e i firmatari non sono dedotti dall'alias del corso. Si configurano in
+`courses.certificates.defaults` oppure si passano come secondo argomento:
+
+```php
+$helper = new CourseCertificatePdfHelper($participation, [
+    'header' => [
+        'organizations' => [
+            ['name' => 'Ecostudio', 'logo' => public_path('images/ecostudio.png')],
+            ['name' => 'Ente patrocinante'],
+        ],
+        'subtitle' => 'Riferimenti normativi del corso',
+    ],
+    'course' => [
+        'title' => 'Titolo completo da stampare',
+        'classification' => 'Aziende Gruppo B e C',
+        'delivery_mode' => 'mista',
+        'starts_on' => '2026-09-29',
+    ],
+    'disclaimer' => [
+        'paragraphs' => ['Testo relativo a organizzazione e riferimenti normativi.'],
+        'assessment' => 'Verifica finale superata con esito positivo.',
+        'notes' => ['Parte teorica svolta in modalità videoconferenza.'],
+        'place' => 'Colceresa',
+        'issued_on' => '2026-10-19',
+    ],
+    'signatures' => [
+        ['role' => 'Responsabile dell’ente', 'name' => 'Nominativo',
+         'image' => storage_path('app/certificates/firma.png')],
+    ],
+]);
+```
+
+Le immagini possono essere file PNG/JPEG/GIF locali o data URI degli stessi
+formati; vengono incorporate nel documento. Le firme sono disposte fino a
+quattro per riga. Tutti i testi sono sottoposti a escaping. Le note riservate
+della partecipazione non vengono stampate e un esito positivo della verifica
+non viene assunto automaticamente. La data di emissione, se non fornita, è
+la data corrente; per una ristampa con la data originale, fornirla esplicitamente.
+Se i contenuti eccedono una pagina il salvataggio si interrompe con un errore.
+
+Si possono inoltre impostare dati per alias in
+`courses.certificates.courses['PS_A']`, con le stesse sezioni dell'esempio.
+La precedenza è: default, dati estratti, dati configurati per alias, argomenti
+espliciti. Gli elenchi vengono sostituiti interamente. `signatures = null` nei
+default conserva i docenti estratti; `signatures = []` li rimuove.
+
+### Contratto per il modello futuro
+
+`IlBronza\Courses\Contracts\CourseCertificateData` è l'interfaccia da implementare
+sul futuro modello della partecipazione, oppure su un suo adapter:
+
+```php
+public function getCourseAlias(): string;
+public function getHeaderData(): array;
+public function getParticipantData(): array;
+public function getCourseData(): array;
+public function getDisclaimerData(): array;
+public function getSignaturesData(): array;
+public function getFilePath(): string;
+```
+
+Il trait non sostituisce l'interfaccia: fornisce solo l'implementazione legacy.
+Quando l'oggetto ricevuto implementa l'interfaccia, l'helper lo usa direttamente
+e non accede a `old`. I metodi restituiscono le sezioni dell'esempio; le chiavi
+minime sono `participant.name` e `course.title`, `course.hours`, `course.ends_on`.
+Le date sono stringhe `Y-m-d`. `getFilePath()` restituisce la destinazione
+assoluta comprensiva del nome file, senza effetti collaterali. Il trait
+`ResolvesCertificateFilePath` è riutilizzabile anche sul modello futuro:
+richiede solamente `getCertificateFilename()`.
+
+### Helper specifici opzionali
+
+È registrato solo il generico in `courses.helpers.certificates`. La mappa
+`courses.models.course.helpers.certificates` è inizialmente vuota. Il suo
+costruttore legge l'alias dalla sorgente e, quando è associata una sottoclasse
+concreta, la istanzia con la stessa sorgente e le delega i metodi. Le sottoclassi
+non ripetono la risoluzione: `parent::__construct()` non provoca ricorsioni.
+
+```php
+// Nell'applicazione ospitante, solo quando esiste davvero la sottoclasse:
+'certificates' => [
+    'PS_A' => App\Helpers\Courses\Certificates\PsCertificateHelper::class,
+],
+```
+
+Le sottoclassi possono sovrascrivere i cinque getter delle sezioni,
+`getViewName()` e `getFilePath()`. Una classe configurata inesistente, astratta
+o incompatibile produce un errore; un alias senza associazione usa il generico.
+Il template Blade predefinito è `courses::certificates.default` ed è sostituibile
+tramite il normale override Laravel in
+`resources/views/vendor/courses/certificates/default.blade.php`.
+
 Questa guida è rivolta a chi deve mantenere o estendere il calcolo della **validità delle responsabilità**. È la parte che, partendo dai corsi completati di un operatore, aggiorna per ogni responsabilità:
 
 - `valid`: se la responsabilità è valida;
