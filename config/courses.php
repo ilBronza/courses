@@ -21,6 +21,10 @@ use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionShowController
 use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionEditUpdateController;
 use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionCreateStoreController;
 use IlBronza\Courses\Http\Controllers\CourseSessions\CourseSessionDestroyController;
+use IlBronza\Courses\Http\Controllers\OperatorCourseSessions\OperatorCourseSessionIndexController;
+use IlBronza\Courses\Http\Controllers\OperatorCourseSessions\OperatorCourseSessionRecentIndexController;
+use IlBronza\Courses\Http\Controllers\OperatorCourseSessions\OperatorCourseSessionByResponsibilityIndexController;
+use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\OperatorCourseSessionFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\FieldsGroups\CourseSessionFieldsGroupParametersFile;
 use IlBronza\Courses\Http\Controllers\Providers\Fieldsets\CourseSessionFieldsetsParameters;
 
@@ -90,10 +94,10 @@ use IlBronza\Courses\Models\CourseSessionDateSession;
 use IlBronza\Courses\Models\CourseWorker;
 use IlBronza\Courses\Models\Date;
 use IlBronza\Courses\Models\DateSession;
+use IlBronza\Courses\Models\OperatorCourseSession;
 use IlBronza\Courses\Models\OperatorResponsibility;
 use IlBronza\Courses\Models\Responsibility;
 use IlBronza\Courses\Models\Worker;
-use IlBronza\Courses\Models\WorkerCourseSession;
 use IlBronza\Courses\Helpers\OperatorResponsibilities\OperatorResponsibilityValidityHelper;
 
 return [
@@ -305,9 +309,15 @@ return [
 			'table' => 'courses__coursesession_datesessions',
 			'class' => CourseSessionDateSession::class,
 		],
-		'workerCoursesession' => [
-			'table' => 'courses__worker_coursesessions',
-			'class' => WorkerCourseSession::class,
+		'operatorCourseSession' => [
+			'table' => 'courses__operator_course_sessions',
+			'class' => OperatorCourseSession::class,
+			'fieldsGroupsFiles' => ['index' => OperatorCourseSessionFieldsGroupParametersFile::class],
+			'controllers' => [
+				'index' => OperatorCourseSessionIndexController::class,
+				'recent' => OperatorCourseSessionRecentIndexController::class,
+				'byResponsibility' => OperatorCourseSessionByResponsibilityIndexController::class,
+			],
 		],
 		'attendance' => [
 			'table' => 'courses__attendances',

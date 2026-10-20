@@ -21,11 +21,62 @@ Il package non è solo il motore di validità. Fornisce il dominio e le migrazio
 | Progettazione | `Date`, `CourseTheme::program` | Definire le tipologie di data e le ore obbligatorie; suddividerle in lezioni per ciascuna tematica. |
 | Erogazione | `CourseSession`, `DateSession` | Creare le edizioni dalle tematiche e calendarizzare le lezioni generate. |
 | Docenti | `Teacher`, `CourseSession::teachers()` | Gestire l’anagrafica e assegnare uno o più docenti a ciascuna edizione. |
-| Partecipazione | `WorkerCourseSession`, `Attendance` | Collegare lavoratori alle sessioni e registrarne la presenza. |
-| Storico lavoratore | `CourseWorker`, `CompanyWorker` | Rappresentare corsi e rapporti del lavoratore, compreso l’accesso ai dati legacy nell’integrazione Ecostudio. |
+| Partecipazione | `OperatorCourseSession` | Collegare gli operatori alle edizioni e conservarne stato, completamento ed esito. |
+| Storico legacy | Dati `course_workers` e `company_worker` | Leggere corsi e rapporti del lavoratore dalla connessione legacy nell’integrazione Ecostudio. |
 | Responsabilità | `OperatorResponsibility`, `ClientOperatorResponsibility` | Assegnare responsabilità agli operatori e calcolarne il relativo stato di validità. |
 
 Le migrazioni del package creano le tabelle con prefisso `courses__`. Le regole di business sulla validità, invece, sono specifiche del progetto Ecostudio e vivono nell’applicazione ospitante.
+
+## Partecipazioni alle edizioni
+
+`OperatorCourseSession` collega un `Operator` a una `CourseSession`. La tabella
+`courses__operator_course_sessions` contiene UUID, `operator_id`,
+`course_session_id`, `client_id`, `status`, `completed_at`, `result`, `note`, timestamp e
+cancellazione logica. Stato, completamento, esito e note sono facoltativi;
+stato ed esito sono stringhe libere, senza un flusso imposto dal package.
+Il corso si ricava tramite `courseSession->course`.
+
+`client_id` è un UUID nullable e indicizzato, predisposto per l’azienda della
+partecipazione. Per ora rimane `null` quando non viene fornito e non viene
+dedotto dai rapporti dell’operatore. Il riferimento non ha un vincolo esterno,
+per consentire la reimportazione delle aziende anche quando cambiano gli ID.
+La migrazione aggiuntiva lascia a `null` anche le partecipazioni già presenti.
+
+```php
+use IlBronza\Courses\Models\OperatorCourseSession;
+
+$participation = OperatorCourseSession::gpc()::create([
+    'operator_id' => $operator->getKey(),
+    'course_session_id' => $edition->getKey(),
+    'status' => 'iscritto',
+]);
+
+$participation->update([
+    'status' => 'completato',
+    'completed_at' => '2026-10-19 18:00:00',
+    'result' => 'superato',
+]);
+```
+
+Le relazioni sono `OperatorCourseSession::operator()`,
+`OperatorCourseSession::courseSession()`, `OperatorCourseSession::client()` e
+`CourseSession::operatorCourseSessions()`. Il trait `OperatorUsesCoursesTrait`,
+da usare sul modello dell’operatore nell’applicazione ospitante, espone
+`operatorCourseSessions()` per consultarne lo storico.
+
+Nel menu **Gestione corsi → Partecipazioni alle edizioni** sono disponibili
+**Recenti** (partecipazioni inserite negli ultimi 12 mesi), **Tutti** e
+**Per tipo**, con una voce per ogni responsabilità ordinata per descrizione.
+Il tipo è la responsabilità del corso dell’edizione (`Course::common_alias`).
+Gli elenchi mostrano operatore, corso, responsabilità, edizione, stato,
+completamento, esito, note e data di inserimento, dalle più recenti.
+
+La coppia operatore/edizione è univoca anche dopo una cancellazione logica:
+per riattivare una partecipazione eliminata si usa `restore()`. Le nuove
+partecipazioni richiedono un operatore e un’edizione attivi. Quelle esistenti
+rimangono consultabili e aggiornabili dopo la cancellazione logica dei genitori.
+La migrazione viene caricata dal provider con `php artisan migrate` e richiede
+che la tabella degli operatori sia già presente.
 
 ## Tematiche dei corsi
 

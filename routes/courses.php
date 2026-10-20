@@ -78,6 +78,13 @@ Route::group(['prefix' => 'date-sessions'], function()
 	Route::put('{dateSession}', [Courses::getController('dateSession', 'update'), 'update'])->name('dateSessions.update');
 });
 
+Route::group(['prefix' => 'operator-course-sessions'], function()
+{
+	Route::get('', [Courses::getController('operatorCourseSession', 'index'), 'index'])->name('operatorCourseSessions.index');
+	Route::get('recent', [Courses::getController('operatorCourseSession', 'recent'), 'index'])->name('operatorCourseSessions.recent');
+	Route::get('by-responsibility/{responsibility}', [Courses::getController('operatorCourseSession', 'byResponsibility'), 'index'])->name('operatorCourseSessions.byResponsibility');
+});
+
 Route::group(['prefix' => 'course-needs'], function()
 {
 	Route::get('{alias}', [Courses::getController('courseNeed', 'index'), 'index'])->name('courseNeeds.index');

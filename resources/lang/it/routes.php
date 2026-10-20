@@ -56,6 +56,11 @@ return [
 			'update' => 'Aggiorna data dell’edizione',
 			'destroy' => 'Elimina data dell’edizione',
 		],
+		'operatorCourseSessions' => [
+			'index' => 'Tutte le partecipazioni alle edizioni',
+			'recent' => 'Partecipazioni alle edizioni recenti',
+			'byResponsibility' => 'Partecipazioni alle edizioni per responsabilità',
+		],
 		'courseNeeds' => [
 			'index' => 'Fabbisogni corso',
 		],

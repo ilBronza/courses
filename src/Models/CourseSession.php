@@ -85,6 +85,11 @@ class CourseSession extends CoursesPackageBaseModel
 		return $this->hasMany(DateSession::gpc())->orderBy('sorting_index');
 	}
 
+	public function operatorCourseSessions()
+	{
+		return $this->hasMany(OperatorCourseSession::gpc(), 'course_session_id');
+	}
+
 	public function teachers()
 	{
 		return $this->belongsToMany(Teacher::gpc(), config('courses.models.courseSessionTeacher.table'), 'course_session_id', 'teacher_id')

@@ -13,6 +13,21 @@ class Courses implements RoutedObjectInterface
 
 	static $packageConfigPrefix = 'courses';
 
+	public function getOperatorCourseSessionsByResponsibilityChildren() : array
+	{
+		return Responsibility::gpc()::orderBy('description')
+			->get()
+			->map(fn (Responsibility $responsibility) => [
+				'name' => 'operatorCourseSessions.byResponsibility.' . $responsibility->getKey(),
+				'icon' => 'user-check',
+				'translatedText' => $responsibility->description ?: $responsibility->getKey(),
+				'href' => $this->route('operatorCourseSessions.byResponsibility', [
+					'responsibility' => $responsibility->getKey(),
+				]),
+			])
+			->all();
+	}
+
 	public function getOperatorResponsibilitiesByResponsibilityChildren() : array
 	{
 		return Responsibility::gpc()::orderBy('description')
@@ -130,6 +145,34 @@ class Courses implements RoutedObjectInterface
 				'icon' => 'calendar-days',
 				'text' => 'courses::courses.courseSessions',
 				'href' => $this->route('courseSessions.index'),
+			])
+		);
+
+		$coursesManagerButton->addChild(
+			$menu->createButton([
+				'name' => 'operatorCourseSessions',
+				'icon' => 'users',
+				'text' => 'courses::courses.operatorCourseSessions',
+				'children' => [
+					[
+						'name' => 'operatorCourseSessions.recent',
+						'icon' => 'clock',
+						'text' => 'courses::courses.recent',
+						'href' => $this->route('operatorCourseSessions.recent'),
+					],
+					[
+						'name' => 'operatorCourseSessions.index',
+						'icon' => 'list',
+						'text' => 'courses::courses.all',
+						'href' => $this->route('operatorCourseSessions.index'),
+					],
+					[
+						'name' => 'operatorCourseSessions.byResponsibility',
+						'icon' => 'user-check',
+						'text' => 'courses::courses.byType',
+						'children' => $this->getOperatorCourseSessionsByResponsibilityChildren(),
+					],
+				],
 			])
 		);
 

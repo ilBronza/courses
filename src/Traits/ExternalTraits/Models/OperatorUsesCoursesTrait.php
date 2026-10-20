@@ -2,6 +2,7 @@
 
 namespace IlBronza\Courses\Traits\ExternalTraits\Models;
 
+use IlBronza\Courses\Models\OperatorCourseSession;
 use IlBronza\Courses\Models\OperatorResponsibility;
 use IlBronza\Courses\Models\Responsibility;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,6 +11,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 trait OperatorUsesCoursesTrait
 {
+	public function operatorCourseSessions()
+	{
+		return $this->hasMany(OperatorCourseSession::gpc(), 'operator_id');
+	}
+
 	public function operatorResponsibilities()
 	{
 	    return $this->hasMany(
