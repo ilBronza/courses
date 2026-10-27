@@ -108,6 +108,50 @@ class OperatorCourseSessionCertificateTest extends TestCase
 		Mail::assertNothingSent();
 	}
 
+	public function test_certificate_preview_returns_the_pdf_inline_for_the_iframe() : void
+	{
+		$participation = $this->participation();
+		$response = $this->get($participation->getCertificateUrl() . '?iframed=true')
+			->assertOk()->assertHeader('Content-Type', 'application/pdf')->assertHeaderMissing('Location');
+		$this->assertStringStartsWith('%PDF-', $response->getContent());
+		$this->assertStringStartsWith('inline;', $response->headers->get('Content-Disposition'));
+		$this->assertStringContainsString($participation->getKey() . '.pdf', $response->headers->get('Content-Disposition'));
+		Mail::assertNothingSent();
+	}
+
+	public function test_certificate_preview_rejects_missing_and_deleted_participations() : void
+	{
+		$participation = $this->participation();
+		$url = $participation->getCertificateUrl();
+		$participation->delete();
+		$this->get($url)->assertNotFound();
+		$this->get(route('ibCourses.operatorCourseSessions.showCertificate', [
+			'operatorCourseSession' => (string) Str::uuid(),
+		]))->assertNotFound();
+		$this->assertDirectoryDoesNotExist($this->directory);
+	}
+
+	public function test_incomplete_certificate_preview_reports_an_error_without_redirecting_the_iframe() : void
+	{
+		$participation = $this->participation();
+		$participation->update(['completed_at' => null]);
+		$this->get($participation->getCertificateUrl() . '?iframed=true')
+			->assertUnprocessable()->assertHeaderMissing('Location');
+		$this->assertDirectoryDoesNotExist($this->directory);
+		Mail::assertNothingSent();
+	}
+
+	public function test_certificate_preview_requires_authentication_and_the_course_role() : void
+	{
+		$url = $this->participation()->getCertificateUrl();
+		$user = auth()->user();
+		$user->syncRoles([]);
+		$this->get($url)->assertForbidden();
+		auth()->logout();
+		$this->getJson($url)->assertUnauthorized();
+		$this->assertDirectoryDoesNotExist($this->directory);
+	}
+
 	public function test_multiple_selections_download_a_zip_with_every_pdf() : void
 	{
 		$first = $this->participation();

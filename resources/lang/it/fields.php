@@ -14,6 +14,7 @@ return [
 	'course_theme_id' => 'Tematica',
 	'courseTheme.name' => 'Tematica',
 	'courseSession.name' => 'Edizione',
+	'mySelfCertificate' => 'Attestato PDF',
 	'courseSession.course.name' => 'Corso',
 	'courseSession.course.responsibility.description' => 'Responsabilità',
 	'status' => 'Stato',

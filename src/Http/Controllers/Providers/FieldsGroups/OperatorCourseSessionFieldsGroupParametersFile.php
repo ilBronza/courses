@@ -12,6 +12,12 @@ class OperatorCourseSessionFieldsGroupParametersFile extends FieldsGroupParamete
 			'translationPrefix' => 'courses::fields',
 			'fields' => [
 				'mySelfPrimary' => 'primary',
+				'mySelfCertificate' => [
+					'type' => 'links.lightbox',
+					'function' => 'getCertificateUrl',
+					'faIcon' => 'file-pdf',
+					'width' => '2em',
+				],
 				'operator.name' => 'flat',
 				'courseSession.course.name' => 'flat',
 				'courseSession.course.responsibility.description' => 'flat',

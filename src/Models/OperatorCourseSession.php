@@ -42,6 +42,13 @@ class OperatorCourseSession extends CoursesPackageBaseModel
 		});
 	}
 
+	public function getCertificateUrl() : string
+	{
+		return app('courses')->route('operatorCourseSessions.showCertificate', [
+			'operatorCourseSession' => $this->getKey(),
+		]);
+	}
+
 	public function operator() : BelongsTo
 	{
 		return $this->belongsTo(Operator::gpc(), 'operator_id')->withTrashed();

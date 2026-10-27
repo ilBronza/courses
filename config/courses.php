@@ -344,6 +344,7 @@ return [
 				'index' => OperatorCourseSessionIndexController::class,
 				'recent' => OperatorCourseSessionRecentIndexController::class,
 				'byResponsibility' => OperatorCourseSessionByResponsibilityIndexController::class,
+				'showCertificate' => OperatorCourseSessionCertificateController::class,
 				'downloadCertificates' => OperatorCourseSessionCertificateController::class,
 				'sendCertificates' => OperatorCourseSessionCertificateController::class,
 			],

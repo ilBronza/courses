@@ -135,7 +135,8 @@ class OperatorCourseSessionIndexTest extends TestCase
 		foreach(['index', 'recent', 'byResponsibility'] as $route)
 			$this->get(route('ibCourses.operatorCourseSessions.' . $route, $route === 'byResponsibility' ? ['responsibility' => 'FL'] : []))
 				->assertOk()->assertSee('Operatore')->assertSee('Edizione')->assertSee('Stato')->assertSee('Esito')
-				->assertSee('Scarica PDF')->assertSee('Invia attestati')
+				->assertSee('Scarica PDF')->assertSee('Invia attestati')->assertSee('Attestato PDF')
+				->assertSee('data-type="iframe"', false)->assertSee('uk-lightbox', false)
 				->assertSee('data-course-certificate-action="download"', false)
 				->assertSee('data-course-certificate-action="send"', false)
 				->assertDontSee('data-redirectsubmit=', false)
@@ -144,6 +145,7 @@ class OperatorCourseSessionIndexTest extends TestCase
 		$response = $this->getJson(route('ibCourses.operatorCourseSessions.index'), ['X-Requested-With' => 'XMLHttpRequest'])->assertOk();
 		$response->assertSee('Operatore prova')->assertSee('Corso FL')->assertSee('Lavoratori')->assertSee('Edizione FL')
 			->assertSee('completato')->assertSee('superato')->assertSee($participation->getKey());
+		$this->assertContains($participation->getCertificateUrl(), $response->json('data.0'));
 	}
 }
 

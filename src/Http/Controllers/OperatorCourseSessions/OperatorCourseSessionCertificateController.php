@@ -17,7 +17,7 @@ use ZipArchive;
 
 class OperatorCourseSessionCertificateController extends OperatorCourseSessionCRUD
 {
-	public $allowedMethods = ['downloadCertificates', 'sendCertificates'];
+	public $allowedMethods = ['showCertificate', 'downloadCertificates', 'sendCertificates'];
 
 	protected function selectedParticipations(Request $request) : Collection
 	{
@@ -81,6 +81,29 @@ class OperatorCourseSessionCertificateController extends OperatorCourseSessionCR
 			$certificates[$id] = ['name' => basename($helper->getFilePath()), 'content' => $helper->generate()];
 
 		return $certificates;
+	}
+
+	public function showCertificate(Request $request, string $operatorCourseSession)
+	{
+		$participation = $this->getModelClass()::with([
+			'operator.userdata', 'courseSession.course', 'courseSession.dateSessions', 'courseSession.teachers',
+		])->findOrFail($operatorCourseSession);
+		abort_unless($participation->userCanSee($request->user()), 403);
+
+		try
+		{
+			$certificate = $this->certificates(new Collection([$participation]))[$participation->getKey()];
+		}
+		catch(ValidationException $exception)
+		{
+			// An iframe must display the error instead of redirecting back to the index.
+			abort(422, collect($exception->errors())->flatten()->implode(' '));
+		}
+
+		return response($certificate['content'], 200, [
+			'Content-Type' => 'application/pdf',
+			'Content-Disposition' => HeaderUtils::makeDisposition('inline', $certificate['name'], str_replace('%', '', Str::ascii($certificate['name']))),
+		]);
 	}
 
 	public function downloadCertificates(Request $request)
