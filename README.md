@@ -2,6 +2,10 @@
 
 Pacchetto Laravel per gestire corsi, sessioni, presenze e responsabilità formative degli operatori.
 
+## Compatibilità Laravel
+
+I vincoli Composer delle dipendenze Laravel e delle relative integrazioni indicano soltanto una versione minima, senza un limite sulle major successive. La scelta delle versioni concrete spetta all’applicazione ospite e al suo `composer.lock`; la compatibilità del codice va verificata con i test.
+
 ## Attestati PDF
 
 `CourseCertificatePdfHelper` è un helper concreto: genera un attestato A4
