@@ -146,6 +146,35 @@ class CourseCertificatePdfHelperTest extends TestCase
 		$this->assertSame($source, $helper->getSource());
 		$this->assertStringContainsString('2,5 ore', $helper->renderHtml());
 		$this->assertSame($this->directory . '/future.pdf', $helper->getFilePath());
+		$this->assertStringStartsWith('data:image/jpeg;base64,', $helper->getViewData()['background']);
+	}
+
+	public function test_legacy_background_inherits_alias_and_explicit_override_wins() : void
+	{
+		$helper = new CourseCertificatePdfHelper($this->participation());
+		$this->assertStringStartsWith('data:image/jpeg;base64,', $helper->getViewData()['background']);
+		$png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a4v8AAAAASUVORK5CYII=';
+		config(['courses.certificates.courses' => ['PS_A' => ['background' => $png]]]);
+		$this->assertSame($png, $helper->getCertificateBackground());
+		$this->assertSame($png, $helper->getViewData()['background']);
+		$this->assertStringContainsString('class="certificate-background" src="' . $png . '"', $helper->renderHtml());
+
+		$explicit = (new CourseCertificatePdfHelper($this->participation(), ['background' => '/explicit.jpg']));
+		$this->assertSame('/explicit.jpg', $explicit->getCertificateBackground());
+		config(['courses.models.course.helpers.certificates' => ['PS_A' => CustomCertificateHelper::class]]);
+		$this->assertSame('/explicit.jpg', (new CourseCertificatePdfHelper($this->participation(), ['background' => '/explicit.jpg']))->getCertificateBackground());
+	}
+
+	public function test_invalid_background_fails_instead_of_silently_generating_a_missing_frame() : void
+	{
+		$helper = new CourseCertificatePdfHelper($this->participation(), ['background' => $this->directory . '/missing.jpg']);
+		try {
+			$helper->save();
+			$this->fail('Missing background accepted.');
+		} catch (InvalidArgumentException $exception) {
+			$this->assertStringContainsString('Immagine attestato inesistente', $exception->getMessage());
+			$this->assertFileDoesNotExist($helper->getFilePath());
+		}
 	}
 
 	public function test_filename_preserves_the_code_and_rejects_paths() : void

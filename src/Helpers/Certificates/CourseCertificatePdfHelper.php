@@ -5,6 +5,7 @@ namespace IlBronza\Courses\Helpers\Certificates;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use IlBronza\Courses\Contracts\CourseCertificateData;
+use IlBronza\Courses\Contracts\HasCertificateBackground;
 use IlBronza\Courses\Helpers\Certificates\Sources\LegacyCourseWorkerCertificateData;
 use IlBronza\Courses\Helpers\Certificates\Sources\OperatorCourseSessionCertificateData;
 use IlBronza\Courses\Models\OperatorCourseSession;
@@ -16,7 +17,7 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /** Generic, usable implementation; optional course helpers extend this class. */
-class CourseCertificatePdfHelper implements CourseCertificateData
+class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificateBackground
 {
 	protected CourseCertificateData $source;
 	protected ?self $courseHelper = null;
@@ -121,6 +122,17 @@ class CourseCertificatePdfHelper implements CourseCertificateData
 		return $this->courseHelper ? $this->courseHelper->getViewName() : config('courses.certificates.view', 'courses::certificates.default');
 	}
 
+	public function getCertificateBackground() : string
+	{
+		if($this->courseHelper)
+			return $this->courseHelper->getCertificateBackground();
+
+		return CertificateBackground::normalize($this->overrides['background'] ?? null)
+			?? ($this->source instanceof HasCertificateBackground
+				? $this->source->getCertificateBackground()
+				: CertificateBackground::forCourseAlias($this->getCourseAlias()));
+	}
+
 	public function getViewData() : array
 	{
 		if($this->courseHelper)
@@ -128,6 +140,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData
 
 		$data = [
 			'alias' => $this->getCourseAlias(),
+			'background' => $this->getCertificateBackground(),
 			'header' => $this->getHeaderData(),
 			'participant' => $this->getParticipantData(),
 			'course' => $this->getCourseData(),
@@ -135,6 +148,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData
 			'signatures' => $this->getSignaturesData(),
 		];
 		$this->validateData($data);
+		$data['background'] = $this->imageSource($data['background']);
 
 		foreach($data['header']['organizations'] as &$organization)
 			$organization['logo'] = $this->imageSource($organization['logo'] ?? null);
@@ -150,6 +164,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData
 	{
 		Validator::make($data, [
 			'alias' => 'required|string',
+			'background' => 'required|string',
 			'header.title' => 'nullable|string|max:255',
 			'header.subtitle' => 'nullable|string',
 			'header.organizations' => 'present|array',
@@ -197,6 +212,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData
 			'course.ends_on.required' => 'Manca la data di completamento della partecipazione: compilala prima di scaricare o inviare l’attestato.',
 		], [
 			'alias' => 'alias del corso',
+			'background' => 'sfondo dell’attestato',
 			'header.title' => 'titolo dell’attestato',
 			'header.subtitle' => 'sottotitolo dell’attestato',
 			'header.organizations' => 'enti dell’attestato',
@@ -245,7 +261,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData
 
 		$info = getimagesize($path);
 		if(! $info || ! in_array($info['mime'], ['image/png', 'image/jpeg', 'image/gif'], true))
-			throw new InvalidArgumentException('I loghi e le firme devono essere immagini PNG, JPEG o GIF.');
+			throw new InvalidArgumentException('Lo sfondo, i loghi e le firme devono essere immagini PNG, JPEG o GIF.');
 
 		return 'data:' . $info['mime'] . ';base64,' . base64_encode(file_get_contents($path));
 	}

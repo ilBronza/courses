@@ -112,6 +112,57 @@ La precedenza è: default, dati estratti, dati configurati per alias, argomenti
 espliciti. Gli elenchi vengono sostituiti interamente. `signatures = null` nei
 default conserva i docenti estratti; `signatures = []` li rimuove.
 
+### Sfondo e gerarchia degli override
+
+Il package include `resources/images/certificates/default.jpg`: la cornice
+originale dell’attestato, A4 orizzontale a 300 dpi. Non richiede pubblicazione
+in `public`. Lo sfondo viene incorporato come data URI e occupa l’intera pagina;
+i margini del documento si applicano al contenuto, non all’immagine.
+
+`CourseSession::getCertificateBackground()` risolve, in ordine:
+
+1. `courses.certificates.sessions[UUID_SESSIONE]['background']`;
+2. `courses.certificates.themes[UUID_TEMATICA]['background']`;
+3. `Course::getCertificateBackground()`, che legge
+   `courses.certificates.courses[ALIAS]['background']`;
+4. `courses.certificates.background`, default dell’applicazione;
+5. il JPG incluso nel package.
+
+Gli override sono configurazioni, senza nuove colonne o migrazioni. I getter
+su `CourseSession` e `Course` possono essere sovrascritti nei modelli
+configurati dall’applicazione per ottenere lo sfondo da altre sorgenti.
+`null`, stringa vuota o soli spazi ereditano dal livello successivo.
+
+```php
+// Dentro la sezione 'certificates' di config/courses.php:
+'background' => public_path('images/attestati/default.jpg'),
+'sessions' => [
+    'UUID_SESSIONE' => ['background' => storage_path('app/attestati/sessione.jpg')],
+],
+'themes' => [
+    'UUID_TEMATICA' => ['background' => storage_path('app/attestati/tematica.jpg')],
+],
+'courses' => [
+    'PS_A' => ['background' => public_path('images/attestati/primo-soccorso.jpg')],
+],
+```
+
+Le chiavi delle mappe sono letterali, anche quando un alias contiene punti.
+Sono ammessi percorsi locali assoluti e data URI PNG/JPEG/GIF; un file
+inesistente o non supportato produce un errore esplicito.
+
+`CourseCertificatePdfHelper::getCertificateBackground()` espone il percorso
+risolto. L’override puntuale passato al costruttore ha precedenza su tutti i
+livelli: `new CourseCertificatePdfHelper($participation, ['background' => $path])`.
+Il dato `background` restituito da `getViewData()` è invece già incorporato.
+
+L’adapter delle partecipazioni native parte dal getter della sessione. Quello
+legacy, privo di una sessione, parte dall’alias del corso letto dalla connessione
+legacy e poi usa gli stessi default. Il contratto opzionale
+`HasCertificateBackground` permette agli adapter personalizzati di fornire il
+proprio getter senza modificare `CourseCertificateData`: le implementazioni
+esistenti continuano a funzionare con alias e default.
+
 ### Contratto per il modello futuro
 
 `IlBronza\Courses\Contracts\CourseCertificateData` è l'interfaccia da implementare
@@ -152,7 +203,7 @@ non ripetono la risoluzione: `parent::__construct()` non provoca ricorsioni.
 ```
 
 Le sottoclassi possono sovrascrivere i cinque getter delle sezioni,
-`getViewName()` e `getFilePath()`. Una classe configurata inesistente, astratta
+`getViewName()`, `getCertificateBackground()` e `getFilePath()`. Una classe configurata inesistente, astratta
 o incompatibile produce un errore; un alias senza associazione usa il generico.
 Il template Blade predefinito è `courses::certificates.default` ed è sostituibile
 tramite il normale override Laravel in

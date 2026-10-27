@@ -2,6 +2,7 @@
 
 namespace IlBronza\Courses\Models;
 
+use IlBronza\Courses\Helpers\Certificates\CertificateBackground;
 use IlBronza\Courses\Models\CoursesPackageBaseModel;
 use IlBronza\Courses\Models\Responsibility;
 use IlBronza\CRUD\Traits\Model\CRUDArchiverTrait;
@@ -32,6 +33,11 @@ class Course extends CoursesPackageBaseModel
 
 	static $modelConfigPrefix = 'course';
 	static $deletingRelationships = ['themes', 'dates', 'courseSessions'];
+
+	public function getCertificateBackground() : string
+	{
+		return CertificateBackground::forCourseAlias((string) $this->alias);
+	}
 
 	public function dates()
 	{

@@ -3,6 +3,7 @@
 namespace IlBronza\Courses\Models;
 
 use IlBronza\Courses\Helpers\CourseProgram;
+use IlBronza\Courses\Helpers\Certificates\CertificateBackground;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -68,6 +69,15 @@ class CourseSession extends CoursesPackageBaseModel
 					'sorting_index' => $index,
 				]);
 		});
+	}
+
+	/** Edition, theme, course type, application default, bundled default. */
+	public function getCertificateBackground() : string
+	{
+		return CertificateBackground::configured('sessions', $this->getKey())
+			?? CertificateBackground::configured('themes', $this->course_theme_id)
+			?? $this->course?->getCertificateBackground()
+			?? CertificateBackground::getDefaultPath();
 	}
 
 	public function course()

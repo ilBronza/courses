@@ -127,6 +127,11 @@ return [
 		// null uses storage_path('app/temp/course-certificates').
 		'temp_directory' => null,
 		'view' => 'courses::certificates.default',
+		// Local image path or data URI; null uses the background bundled in the package.
+		'background' => null,
+		// Optional backgrounds keyed by edition UUID and theme UUID.
+		'sessions' => [],
+		'themes' => [],
 		'defaults' => [
 			'header' => ['title' => 'ATTESTATO DI FREQUENZA', 'subtitle' => null, 'organizations' => []],
 			'participant' => ['tax_code' => null, 'company' => null, 'role' => null, 'ateco' => null],
