@@ -206,6 +206,34 @@ possono implementare il contratto opzionale `HasCertificateLogo`, mantenendo
 compatibilità con le implementazioni preesistenti di `CourseCertificateData`.
 Gli attestati legacy partono dall’alias del corso e seguono gli stessi default.
 
+### Firme dei docenti e loghi degli enti
+
+I PNG vengono cercati usando direttamente `Str::slug($name) . '.png'`:
+`Anna Rigon` → `signatures/anna-rigon.png`, `Aine Servizi` →
+`organizations/aine-servizi.png`. Ordine delle parole e prefissi restano quelli
+del nominativo; non vengono invertiti né rimossi.
+
+La precedenza è: percorso esplicito in `signatures[*].image` o
+`header.organizations[*].logo`, poi file nel package, infine file nell’app.
+Le due cartelle di base sono rispettivamente
+`resources/images/certificates` del package e dell’app. Sono configurabili,
+in ordine di ricerca, tramite `courses.certificates.asset_paths`. Non occorre
+pubblicare le immagini: vengono incorporate nel PDF come data URI.
+
+`Teacher::getSignatureImagePath()` restituisce la firma del docente ed è
+sovrascrivibile. Per gli enti senza modello dedicato è disponibile
+`CertificateAssets::getOrganizationLogoPath($name)`; la stessa classe espone
+`getTeacherSignaturePath($name)`. Entrambi i getter sono disponibili anche
+sull’helper PDF e possono essere sovrascritti dagli helper specifici del corso.
+`Course::getCertificateOrganizations()` può fornire gli enti della testata
+alle partecipazioni native; per default restituisce un elenco vuoto.
+
+L’assenza del PNG lascia il nominativo nell’attestato. `null` o una chiave
+immagine assente attivano la ricerca automatica; una stringa vuota la disattiva
+per quella voce. Un percorso esplicito non valido continua a produrre errore.
+I nominativi legacy su righe separate generano una firma per riga; quelli su
+una stessa riga restano invariati.
+
 ### Contratto per il modello futuro
 
 `IlBronza\Courses\Contracts\CourseCertificateData` è l'interfaccia da implementare

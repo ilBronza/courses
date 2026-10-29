@@ -122,9 +122,14 @@ trait ExtractsLegacyCourseWorkerCertificateData
 
 	public function getSignaturesData() : array
 	{
-		$teachers = trim((string) ($this->getCourseWorker()->teacher_string ?? ''));
+		return collect($this->getCertificateTeacherNames())->map(fn ($name) => trim($name))
+			->filter(fn ($name) => $name !== '')->unique()->values()
+			->map(fn ($name) => ['role' => 'Docente del corso', 'name' => $name, 'image' => null])->all();
+	}
 
-		return $teachers === '' ? [] : [['role' => 'Docenti del corso', 'name' => $teachers, 'image' => null]];
+	protected function getCertificateTeacherNames() : array
+	{
+		return preg_split('/\R/u', (string) ($this->getCourseWorker()->teacher_string ?? '')) ?: [];
 	}
 
 	protected function getCertificateFilename() : string

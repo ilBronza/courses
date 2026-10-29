@@ -75,6 +75,37 @@ class CourseCertificatePdfHelperTest extends TestCase
 		], $attributes);
 	}
 
+	public function test_named_pngs_are_embedded_and_explicit_images_and_opt_out_take_precedence() : void
+	{
+		$png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a4v8AAAAASUVORK5CYII=';
+		foreach(['signatures/anna-rigon.png', 'organizations/aine-servizi.png'] as $file)
+		{
+			File::ensureDirectoryExists(dirname($this->directory . '/' . $file));
+			file_put_contents($this->directory . '/' . $file, base64_decode(explode(',', $png)[1]));
+		}
+		config(['courses.certificates.asset_paths' => [$this->directory]]);
+		$participation = $this->participation(['teacher_string' => "Anna Rigon\r\n\nDocente senza firma\nAnna Rigon"]);
+		$helper = new CourseCertificatePdfHelper($participation, ['header' => ['organizations' => [
+			['name' => 'Aine Servizi'], ['name' => 'Ente senza logo'],
+		]]]);
+		$data = $helper->getViewData();
+		$this->assertSame(['Anna Rigon', 'Docente senza firma'], array_column($data['signatures'], 'name'));
+		$this->assertSame([$png, null], array_column($data['signatures'], 'image'));
+		$this->assertSame([$png, null], array_column($data['header']['organizations'], 'logo'));
+		$html = $helper->renderHtml();
+		$this->assertSame(2, substr_count($html, $png));
+		$this->assertStringContainsString('Docente senza firma', $html);
+		$this->assertStringContainsString('Ente senza logo', $html);
+
+		$explicit = 'data:image/jpeg;base64,' . base64_encode(file_get_contents(__DIR__ . '/../../resources/images/certificates/logo.jpg'));
+		$data = (new CourseCertificatePdfHelper($participation, [
+			'header' => ['organizations' => [['name' => 'Aine Servizi', 'logo' => $explicit], ['name' => 'Aine Servizi', 'logo' => '']]],
+			'signatures' => [['name' => 'Anna Rigon', 'image' => $explicit], ['name' => 'Anna Rigon', 'image' => '']],
+		]))->getViewData();
+		$this->assertSame([$explicit, null], array_column($data['signatures'], 'image'));
+		$this->assertSame([$explicit, null], array_column($data['header']['organizations'], 'logo'));
+	}
+
 	public function test_extracts_from_old_without_using_the_default_catalog_or_private_notes() : void
 	{
 		Schema::create('courses', function (Blueprint $table) { $table->id(); $table->string('alias'); });

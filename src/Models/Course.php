@@ -45,6 +45,11 @@ class Course extends CoursesPackageBaseModel
 		return CertificateLogo::forCourseAlias((string) $this->alias);
 	}
 
+	public function getCertificateOrganizations() : array
+	{
+		return [];
+	}
+
 	public function dates()
 	{
 		return $this->hasMany(Date::gpc())->orderBy('sorting_index')->orderBy('name');

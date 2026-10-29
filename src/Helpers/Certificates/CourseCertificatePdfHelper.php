@@ -145,6 +145,18 @@ class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificat
 				: CertificateLogo::forCourseAlias($this->getCourseAlias()));
 	}
 
+	public function getTeacherSignaturePath(string $name) : ?string
+	{
+		return $this->courseHelper ? $this->courseHelper->getTeacherSignaturePath($name)
+			: CertificateAssets::getTeacherSignaturePath($name);
+	}
+
+	public function getOrganizationLogoPath(string $name) : ?string
+	{
+		return $this->courseHelper ? $this->courseHelper->getOrganizationLogoPath($name)
+			: CertificateAssets::getOrganizationLogoPath($name);
+	}
+
 	public function getViewData() : array
 	{
 		if($this->courseHelper)
@@ -165,10 +177,10 @@ class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificat
 		$data['logo'] = $this->imageSource($data['logo']);
 
 		foreach($data['header']['organizations'] as &$organization)
-			$organization['logo'] = $this->imageSource($organization['logo'] ?? null);
+			$organization['logo'] = $this->imageSource($organization['logo'] ?? $this->getOrganizationLogoPath($organization['name']));
 		unset($organization);
 		foreach($data['signatures'] as &$signature)
-			$signature['image'] = $this->imageSource($signature['image'] ?? null);
+			$signature['image'] = $this->imageSource($signature['image'] ?? $this->getTeacherSignaturePath($signature['name']));
 		unset($signature);
 
 		return $data;

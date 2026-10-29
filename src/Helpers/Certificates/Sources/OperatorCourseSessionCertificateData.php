@@ -39,7 +39,9 @@ class OperatorCourseSessionCertificateData implements CourseCertificateData, Has
 
 	public function getHeaderData() : array
 	{
-		return [];
+		$organizations = $this->participation->courseSession?->course?->getCertificateOrganizations() ?? [];
+
+		return $organizations === [] ? [] : ['organizations' => $organizations];
 	}
 
 	public function getParticipantData() : array
@@ -77,7 +79,11 @@ class OperatorCourseSessionCertificateData implements CourseCertificateData, Has
 	public function getSignaturesData() : array
 	{
 		return ($this->participation->courseSession?->teachers ?? collect())
-			->map(fn ($teacher) => ['name' => $teacher->name, 'role' => 'Docente del corso'])->all();
+			->map(fn ($teacher) => [
+				'name' => $teacher->name,
+				'role' => 'Docente del corso',
+				'image' => $teacher->getSignatureImagePath(),
+			])->all();
 	}
 
 	protected function getCertificateFilename() : string

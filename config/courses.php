@@ -131,6 +131,11 @@ return [
 		'background' => null,
 		// Package logo; null or a missing file falls back to the application's logo.
 		'logo' => __DIR__ . '/../resources/images/certificates/logo.jpg',
+		// Named PNGs: signatures/{slug}.png and organizations/{slug}.png, first match wins.
+		'asset_paths' => [
+			__DIR__ . '/../resources/images/certificates',
+			resource_path('images/certificates'),
+		],
 		// Optional backgrounds and logos keyed by edition UUID and theme UUID.
 		'sessions' => [],
 		'themes' => [],
