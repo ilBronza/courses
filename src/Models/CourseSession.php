@@ -4,6 +4,7 @@ namespace IlBronza\Courses\Models;
 
 use IlBronza\Courses\Helpers\CourseProgram;
 use IlBronza\Courses\Helpers\Certificates\CertificateBackground;
+use IlBronza\Courses\Helpers\Certificates\CertificateLogo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -78,6 +79,14 @@ class CourseSession extends CoursesPackageBaseModel
 			?? CertificateBackground::configured('themes', $this->course_theme_id)
 			?? $this->course?->getCertificateBackground()
 			?? CertificateBackground::getDefaultPath();
+	}
+
+	public function getCertificateLogo() : ?string
+	{
+		return CertificateLogo::configured('sessions', $this->getKey())
+			?? CertificateLogo::configured('themes', $this->course_theme_id)
+			?? $this->course?->getCertificateLogo()
+			?? CertificateLogo::getDefaultPath();
 	}
 
 	public function course()

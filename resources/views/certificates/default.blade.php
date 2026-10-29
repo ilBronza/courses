@@ -22,7 +22,9 @@
 		table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 		td { text-align: center; vertical-align: top; }
 		.organizations td { vertical-align: middle; padding: 0 3mm; }
-		.organizations img { max-width: 65mm; max-height: 14mm; }
+		.organizations img { max-width: 100%; max-height: 14mm; }
+		.organizations .certificate-logo { text-align: left; padding: 0 3mm 0 0; }
+		.certificate-logo img { max-width: 65mm; max-height: 14mm; }
 		.organization-name { font-size: 9pt; }
 		h1 { font-size: 19pt; font-weight: normal; text-align: center; margin: 3mm 0 1mm; }
 		.subtitle { font-size: 7.5pt; text-align: center; margin: 0 0 1mm; }
@@ -54,10 +56,15 @@
 <div class="certificate">
 	<table class="certificate-layout" role="presentation">
 		<tr><td class="certificate-section certificate-header">
-			@if(count($header['organizations']))
+			@if($logo || count($header['organizations']))
 				<table class="organizations"><tr>
+					@if($logo)
+						<td class="certificate-logo" style="width: {{ count($header['organizations']) ? 28 : 100 }}%">
+							<img src="{{ $logo }}" alt="Logo ente organizzatore">
+						</td>
+					@endif
 					@foreach($header['organizations'] as $organization)
-						<td style="width: {{ 100 / count($header['organizations']) }}%">
+						<td style="width: {{ ($logo ? 72 : 100) / count($header['organizations']) }}%">
 							@if($organization['logo'] ?? null)
 								<img src="{{ $organization['logo'] }}" alt="{{ $organization['name'] }}">
 							@else

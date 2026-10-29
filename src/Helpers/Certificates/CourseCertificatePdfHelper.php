@@ -6,6 +6,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use IlBronza\Courses\Contracts\CourseCertificateData;
 use IlBronza\Courses\Contracts\HasCertificateBackground;
+use IlBronza\Courses\Contracts\HasCertificateLogo;
 use IlBronza\Courses\Helpers\Certificates\Sources\LegacyCourseWorkerCertificateData;
 use IlBronza\Courses\Helpers\Certificates\Sources\OperatorCourseSessionCertificateData;
 use IlBronza\Courses\Models\OperatorCourseSession;
@@ -17,7 +18,7 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /** Generic, usable implementation; optional course helpers extend this class. */
-class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificateBackground
+class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificateBackground, HasCertificateLogo
 {
 	protected CourseCertificateData $source;
 	protected ?self $courseHelper = null;
@@ -133,6 +134,17 @@ class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificat
 				: CertificateBackground::forCourseAlias($this->getCourseAlias()));
 	}
 
+	public function getCertificateLogo() : ?string
+	{
+		if($this->courseHelper)
+			return $this->courseHelper->getCertificateLogo();
+
+		return CertificateLogo::normalize($this->overrides['logo'] ?? null)
+			?? ($this->source instanceof HasCertificateLogo
+				? $this->source->getCertificateLogo()
+				: CertificateLogo::forCourseAlias($this->getCourseAlias()));
+	}
+
 	public function getViewData() : array
 	{
 		if($this->courseHelper)
@@ -141,6 +153,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificat
 		$data = [
 			'alias' => $this->getCourseAlias(),
 			'background' => $this->getCertificateBackground(),
+			'logo' => $this->getCertificateLogo(),
 			'header' => $this->getHeaderData(),
 			'participant' => $this->getParticipantData(),
 			'course' => $this->getCourseData(),
@@ -149,6 +162,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificat
 		];
 		$this->validateData($data);
 		$data['background'] = $this->imageSource($data['background']);
+		$data['logo'] = $this->imageSource($data['logo']);
 
 		foreach($data['header']['organizations'] as &$organization)
 			$organization['logo'] = $this->imageSource($organization['logo'] ?? null);
@@ -165,6 +179,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificat
 		Validator::make($data, [
 			'alias' => 'required|string',
 			'background' => 'required|string',
+			'logo' => 'nullable|string',
 			'header.title' => 'nullable|string|max:255',
 			'header.subtitle' => 'nullable|string',
 			'header.organizations' => 'present|array',
@@ -213,6 +228,7 @@ class CourseCertificatePdfHelper implements CourseCertificateData, HasCertificat
 		], [
 			'alias' => 'alias del corso',
 			'background' => 'sfondo dell’attestato',
+			'logo' => 'logo principale dell’attestato',
 			'header.title' => 'titolo dell’attestato',
 			'header.subtitle' => 'sottotitolo dell’attestato',
 			'header.organizations' => 'enti dell’attestato',

@@ -163,6 +163,49 @@ legacy e poi usa gli stessi default. Il contratto opzionale
 proprio getter senza modificare `CourseCertificateData`: le implementazioni
 esistenti continuano a funzionare con alias e default.
 
+### Logo principale dell’attestato
+
+`getCertificateLogo()` è disponibile su `CourseSession`, `Course` e
+`CourseCertificatePdfHelper`. Restituisce un percorso locale o una data URI,
+oppure `null` quando non è disponibile alcun logo. La priorità è:
+
+1. override `logo` passato al costruttore dell’helper;
+2. `courses.certificates.sessions[UUID_SESSIONE]['logo']`;
+3. `courses.certificates.themes[UUID_TEMATICA]['logo']`;
+4. `Course::getCertificateLogo()`, che legge `courses.certificates.courses[ALIAS]['logo']`;
+5. `courses.certificates.logo`, inizialmente il logo Ecostudio originale
+   estratto dal PDF e incluso in `resources/images/certificates/logo.jpg`;
+6. logo dell’applicazione: primo asset locale disponibile tra `app.logo`,
+   `uikittemplate.logo` e `menu.logo.path`.
+
+Un valore vuoto a livello di sessione, tematica o corso eredita dal livello
+successivo. Se il logo del package è nullo, vuoto o il file non esiste,
+si usa quello dell’applicazione. Un override specifico non valido produce
+invece un errore esplicito. Per usare il logo dell’app, impostare:
+
+```php
+// config/courses.php, sezione 'certificates'
+'logo' => null,
+// Oppure personalizzare uno o più livelli:
+'sessions' => ['UUID_SESSIONE' => ['logo' => storage_path('app/loghi/sessione.jpg')]],
+'courses' => ['PS_A' => ['logo' => public_path('images/primo-soccorso.png')]],
+```
+
+Per il logo dell’app sono supportati percorsi assoluti, percorsi relativi a
+`public`, URL dello stesso host di `app.url` (risolti sul filesystem pubblico)
+e data URI PNG/JPEG/GIF. Non si eseguono richieste HTTP. Se nessun logo locale
+è disponibile, il documento resta generabile senza un’immagine mancante.
+
+Il logo principale è allineato in alto a sinistra; gli enti già presenti in
+`header.organizations` rimangono sulla stessa riga, alla sua destra. Inserire
+qui solo gli altri enti per non ripetere il logo principale. `getViewData()`
+espone il logo già incorporato nella chiave `logo`.
+
+I getter dei modelli possono essere sovrascritti dall’applicazione. Gli adapter
+possono implementare il contratto opzionale `HasCertificateLogo`, mantenendo
+compatibilità con le implementazioni preesistenti di `CourseCertificateData`.
+Gli attestati legacy partono dall’alias del corso e seguono gli stessi default.
+
 ### Contratto per il modello futuro
 
 `IlBronza\Courses\Contracts\CourseCertificateData` è l'interfaccia da implementare
@@ -203,7 +246,7 @@ non ripetono la risoluzione: `parent::__construct()` non provoca ricorsioni.
 ```
 
 Le sottoclassi possono sovrascrivere i cinque getter delle sezioni,
-`getViewName()`, `getCertificateBackground()` e `getFilePath()`. Una classe configurata inesistente, astratta
+`getViewName()`, `getCertificateBackground()`, `getCertificateLogo()` e `getFilePath()`. Una classe configurata inesistente, astratta
 o incompatibile produce un errore; un alias senza associazione usa il generico.
 Il template Blade predefinito è `courses::certificates.default` ed è sostituibile
 tramite il normale override Laravel in

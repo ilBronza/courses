@@ -147,6 +147,7 @@ class CourseCertificatePdfHelperTest extends TestCase
 		$this->assertStringContainsString('2,5 ore', $helper->renderHtml());
 		$this->assertSame($this->directory . '/future.pdf', $helper->getFilePath());
 		$this->assertStringStartsWith('data:image/jpeg;base64,', $helper->getViewData()['background']);
+		$this->assertStringStartsWith('data:image/jpeg;base64,', $helper->getViewData()['logo']);
 	}
 
 	public function test_legacy_background_inherits_alias_and_explicit_override_wins() : void
@@ -171,6 +172,42 @@ class CourseCertificatePdfHelperTest extends TestCase
 		try {
 			$helper->save();
 			$this->fail('Missing background accepted.');
+		} catch (InvalidArgumentException $exception) {
+			$this->assertStringContainsString('Immagine attestato inesistente', $exception->getMessage());
+			$this->assertFileDoesNotExist($helper->getFilePath());
+		}
+	}
+
+	public function test_legacy_logo_is_embedded_with_partner_logos_and_honors_alias_and_explicit_overrides() : void
+	{
+		$helper = new CourseCertificatePdfHelper($this->participation(), ['header' => ['organizations' => [['name' => 'Partner']]]]);
+		$default = $helper->getCertificateLogo();
+		$this->assertStringStartsWith('data:image/jpeg;base64,', $helper->getViewData()['logo']);
+		$html = $helper->renderHtml();
+		$this->assertStringContainsString('class="certificate-logo"', $html);
+		$this->assertStringContainsString('Partner', $html);
+		config(['courses.certificates.courses' => ['PS_A' => ['logo' => '/course.jpg']]]);
+		$this->assertSame('/course.jpg', $helper->getCertificateLogo());
+		config(['courses.models.course.helpers.certificates' => ['PS_A' => CustomCertificateHelper::class]]);
+		$this->assertSame($default, (new CourseCertificatePdfHelper($this->participation(), ['logo' => $default]))->getCertificateLogo());
+	}
+
+	public function test_absent_package_and_application_logos_leave_no_broken_image() : void
+	{
+		config(['courses.certificates.logo' => null, 'app.logo' => null, 'uikittemplate.logo' => null, 'menu.logo.path' => null]);
+		$helper = new CourseCertificatePdfHelper($this->participation());
+		$this->assertNull($helper->getCertificateLogo());
+		$this->assertNull($helper->getViewData()['logo']);
+		$this->assertStringNotContainsString('class="certificate-logo"', $helper->renderHtml());
+		$this->assertStringStartsWith('%PDF-', $helper->generate());
+	}
+
+	public function test_invalid_explicit_logo_fails_before_writing_a_certificate() : void
+	{
+		$helper = new CourseCertificatePdfHelper($this->participation(), ['logo' => $this->directory . '/missing.jpg']);
+		try {
+			$helper->save();
+			$this->fail('Missing explicit logo accepted.');
 		} catch (InvalidArgumentException $exception) {
 			$this->assertStringContainsString('Immagine attestato inesistente', $exception->getMessage());
 			$this->assertFileDoesNotExist($helper->getFilePath());

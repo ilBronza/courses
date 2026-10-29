@@ -129,7 +129,9 @@ return [
 		'view' => 'courses::certificates.default',
 		// Local image path or data URI; null uses the background bundled in the package.
 		'background' => null,
-		// Optional backgrounds keyed by edition UUID and theme UUID.
+		// Package logo; null or a missing file falls back to the application's logo.
+		'logo' => __DIR__ . '/../resources/images/certificates/logo.jpg',
+		// Optional backgrounds and logos keyed by edition UUID and theme UUID.
 		'sessions' => [],
 		'themes' => [],
 		'defaults' => [

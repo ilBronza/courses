@@ -4,12 +4,14 @@ namespace IlBronza\Courses\Helpers\Certificates\Sources;
 
 use IlBronza\Courses\Contracts\CourseCertificateData;
 use IlBronza\Courses\Contracts\HasCertificateBackground;
+use IlBronza\Courses\Contracts\HasCertificateLogo;
 use IlBronza\Courses\Helpers\Certificates\CertificateBackground;
+use IlBronza\Courses\Helpers\Certificates\CertificateLogo;
 use IlBronza\Courses\Models\OperatorCourseSession;
 use IlBronza\Courses\Traits\Certificates\ResolvesCertificateFilePath;
 use Illuminate\Support\Str;
 
-class OperatorCourseSessionCertificateData implements CourseCertificateData, HasCertificateBackground
+class OperatorCourseSessionCertificateData implements CourseCertificateData, HasCertificateBackground, HasCertificateLogo
 {
 	use ResolvesCertificateFilePath;
 
@@ -27,6 +29,12 @@ class OperatorCourseSessionCertificateData implements CourseCertificateData, Has
 	{
 		return $this->participation->courseSession?->getCertificateBackground()
 			?? CertificateBackground::getDefaultPath();
+	}
+
+	public function getCertificateLogo() : ?string
+	{
+		return $this->participation->courseSession?->getCertificateLogo()
+			?? CertificateLogo::getDefaultPath();
 	}
 
 	public function getHeaderData() : array
